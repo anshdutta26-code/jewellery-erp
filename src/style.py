@@ -32,19 +32,78 @@ def inject_css() -> None:
         }
 
         .stApp {
+          position: relative;
+          overflow-x: hidden;
           background:
-            radial-gradient(circle at 98% 3%, rgba(210,163,58,.07), transparent 22rem),
+            radial-gradient(circle at 8% 10%, rgba(210,163,58,.12), transparent 18rem),
+            radial-gradient(circle at 96% 18%, rgba(16,60,43,.08), transparent 22rem),
+            radial-gradient(circle at 82% 82%, rgba(210,163,58,.08), transparent 24rem),
             linear-gradient(180deg, #FFFDF9 0%, #F8F3E8 100%);
           color: var(--srj-green-dark);
         }
 
+        .stApp::before {
+          content: "";
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          z-index: 0;
+          opacity: .22;
+          background-image:
+            linear-gradient(45deg, transparent 48%, rgba(210,163,58,.11) 49%, rgba(210,163,58,.11) 51%, transparent 52%),
+            linear-gradient(-45deg, transparent 48%, rgba(210,163,58,.07) 49%, rgba(210,163,58,.07) 51%, transparent 52%);
+          background-size: 74px 74px;
+          mask-image: radial-gradient(circle at 50% 35%, black 0%, transparent 72%);
+        }
+
         .block-container {
-          padding-top: 1.45rem;
+          position: relative;
+          z-index: 1;
+          padding-top: 4.6rem;
           padding-bottom: 3rem;
           max-width: 1480px;
         }
 
         /* Header / titles */
+        .erp-hero {
+          position: relative;
+          overflow: hidden;
+          margin: 0 0 1.2rem 0;
+          padding: 1.35rem 1.5rem 1.25rem 1.5rem;
+          border: 1px solid rgba(210,163,58,.58);
+          border-radius: 10px;
+          background:
+            radial-gradient(circle at 90% 20%, rgba(230,198,110,.12), transparent 13rem),
+            linear-gradient(135deg, #123E2C 0%, #0A2E22 74%);
+          box-shadow: 0 12px 30px rgba(10,46,34,.10);
+        }
+
+        .erp-hero::after {
+          content: "◇";
+          position: absolute;
+          right: 1.1rem;
+          top: -.45rem;
+          color: rgba(230,198,110,.12);
+          font-family: Georgia, serif;
+          font-size: 6.2rem;
+          line-height: 1;
+          transform: rotate(8deg);
+        }
+
+        .erp-hero .srj-eyebrow {
+          color: var(--srj-gold-light);
+        }
+
+        .erp-hero .erp-title {
+          color: #FFF8E6;
+          margin-bottom: .35rem;
+        }
+
+        .erp-hero .erp-sub {
+          color: rgba(255,248,230,.72);
+          margin-bottom: 0;
+        }
+
         .srj-eyebrow {
           color: var(--srj-gold);
           font-size: .70rem;
@@ -86,7 +145,7 @@ def inject_css() -> None:
           width: 156px;
           height: 156px;
           border-radius: 50%;
-          margin: .15rem auto .85rem auto;
+          margin: .55rem auto .9rem auto;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -241,10 +300,12 @@ def inject_css() -> None:
         }
 
         [data-testid="stForm"] {
-          background: rgba(255,253,248,.68);
-          border: 1px solid rgba(210,163,58,.22);
+          background: rgba(255,253,248,.88);
+          border: 1px solid rgba(210,163,58,.30);
           border-radius: 10px;
           padding: 1rem;
+          box-shadow: 0 10px 28px rgba(10,46,34,.045);
+          backdrop-filter: blur(6px);
         }
 
         /* Buttons, inspired by website CTA */
@@ -273,25 +334,35 @@ def inject_css() -> None:
 
         /* Tabs match collection navigation */
         [data-baseweb="tab-list"] {
-          gap: .15rem;
-          border-bottom: 1px solid rgba(210,163,58,.28);
+          gap: 0;
+          padding: .18rem;
+          border: 1px solid rgba(210,163,58,.34);
+          border-radius: 7px;
+          background: linear-gradient(180deg, #143F2E 0%, #0D3225 100%);
+          box-shadow: 0 5px 16px rgba(10,46,34,.07);
         }
 
         button[data-baseweb="tab"] {
           background: transparent !important;
-          color: var(--srj-green) !important;
+          color: rgba(255,248,230,.78) !important;
           text-transform: uppercase;
-          letter-spacing: .11em;
-          font-size: .72rem;
+          letter-spacing: .10em;
+          font-size: .70rem;
           font-weight: 600;
-          padding-left: .9rem !important;
-          padding-right: .9rem !important;
+          border-radius: 5px !important;
+          padding-left: 1rem !important;
+          padding-right: 1rem !important;
+        }
+
+        button[data-baseweb="tab"]:hover {
+          color: var(--srj-gold-light) !important;
+          background: rgba(210,163,58,.08) !important;
         }
 
         button[data-baseweb="tab"][aria-selected="true"] {
-          background: rgba(16,60,43,.06) !important;
-          color: var(--srj-gold) !important;
-          border-bottom: 2px solid var(--srj-gold) !important;
+          background: rgba(210,163,58,.12) !important;
+          color: var(--srj-gold-light) !important;
+          box-shadow: inset 0 -2px 0 var(--srj-gold);
         }
 
         /* Tables / dataframes */
@@ -348,10 +419,33 @@ def inject_css() -> None:
         .muted { color: var(--srj-sage); }
 
         @media (max-width: 800px) {
-          .block-container { padding-top: .8rem; }
+          .block-container {
+            padding-top: 7.1rem !important;
+            padding-left: .95rem;
+            padding-right: .95rem;
+          }
+          .srj-seal {
+            width: 142px;
+            height: 142px;
+            margin-top: .25rem;
+          }
+          .srj-monogram { font-size: 2.75rem; }
+          .erp-hero {
+            padding: 1.05rem 1rem;
+            border-radius: 8px;
+          }
           .erp-title { font-size: 1.95rem; }
           .login-brand .headline { font-size: 2.1rem; }
+          .login-brand .tag {
+            font-size: .62rem;
+            letter-spacing: .19em;
+          }
           div[data-testid="stMetric"] { min-height: 96px; }
+          button[data-baseweb="tab"] {
+            font-size: .64rem;
+            padding-left: .68rem !important;
+            padding-right: .68rem !important;
+          }
         }
         </style>
         """,
@@ -360,7 +454,14 @@ def inject_css() -> None:
 
 
 def page_header(title: str, subtitle: str = "") -> None:
-    st.markdown('<div class="srj-eyebrow">SHUBHRAJ JEWELS · ERP</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="erp-title">{title}</div>', unsafe_allow_html=True)
-    if subtitle:
-        st.markdown(f'<div class="erp-sub">{subtitle}</div>', unsafe_allow_html=True)
+    sub_html = f'<div class="erp-sub">{subtitle}</div>' if subtitle else ""
+    st.markdown(
+        f"""
+        <div class="erp-hero">
+          <div class="srj-eyebrow">SHUBHRAJ JEWELS · ERP</div>
+          <div class="erp-title">{title}</div>
+          {sub_html}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
