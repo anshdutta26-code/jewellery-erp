@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from io import BytesIO
+from html import escape
 from typing import Any
 
-import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -83,44 +83,88 @@ def require_user():
         """,
         unsafe_allow_html=True,
     )
-    tab1, tab2 = st.tabs(["Sign in", "Create first account"])
+
+    tab1, tab2 = st.tabs(["Sign in", "Create account"])
+
     with tab1:
         with st.form("login"):
-            email = st.text_input("Email")
-            password = st.text_input("Password", type="password")
+            username = st.text_input(
+                "Username",
+                placeholder="Enter your username",
+                autocomplete="username",
+            )
+            password = st.text_input(
+                "Password",
+                type="password",
+                placeholder="Enter your password",
+                autocomplete="current-password",
+            )
             submit = st.form_submit_button("Sign in", type="primary", use_container_width=True)
+
         if submit:
             try:
-                st.session_state.user = sign_in(email.strip(), password)
+                st.session_state.user = sign_in(username.strip(), password)
                 st.rerun()
             except Exception as exc:
-                st.error(f"Sign-in failed: {exc}")
+                st.error(str(exc))
 
     with tab2:
-        st.caption("Use this only for the first administrator. Supabase may require email verification depending on your Auth settings.")
+        st.caption("Email is used only for account verification and recovery. Daily sign-in uses your username.")
         with st.form("signup"):
             full_name = st.text_input("Full name")
-            email2 = st.text_input("Email", key="signup_email")
-            password2 = st.text_input("Password", type="password", key="signup_password")
+            username2 = st.text_input(
+                "Username",
+                placeholder="e.g. anshdutta26",
+                help="3–30 characters. Letters, numbers, dot, underscore and hyphen only.",
+            )
+            email2 = st.text_input("Recovery / verification email", key="signup_email")
+            password2 = st.text_input(
+                "Password",
+                type="password",
+                key="signup_password",
+                autocomplete="new-password",
+            )
             create = st.form_submit_button("Create account", use_container_width=True)
-        if create:
-            try:
-                res = auth_client().auth.sign_up({
-                    "email": email2.strip(),
-                    "password": password2,
-                    "options": {
-                        "data": {"full_name": full_name},
-                        "email_redirect_to": "https://jewellery-erp.streamlit.app",
-                    },
-                })
-                if res.user:
-                    st.success("Account created. If email confirmation is enabled in Supabase, confirm the email, then sign in.")
-                else:
-                    st.warning("Supabase did not return a user. Check your Auth settings.")
-            except Exception as exc:
-                st.error(str(exc))
-    st.stop()
 
+        if create:
+            clean_username = username2.strip().lower()
+            valid_username = (
+                3 <= len(clean_username) <= 30
+                and all(ch.isalnum() or ch in "._-" for ch in clean_username)
+            )
+            if not valid_username:
+                st.error("Choose a username with 3–30 letters, numbers, dots, underscores or hyphens.")
+            elif not email2.strip():
+                st.error("A verification email is required.")
+            else:
+                try:
+                    existing = auth_client().rpc(
+                        "resolve_login_email",
+                        {"p_username": clean_username},
+                    ).execute().data
+                    if existing:
+                        st.error("That username is already in use.")
+                    else:
+                        res = auth_client().auth.sign_up({
+                            "email": email2.strip(),
+                            "password": password2,
+                            "options": {
+                                "data": {
+                                    "full_name": full_name.strip() or clean_username,
+                                    "username": clean_username,
+                                },
+                                "email_redirect_to": "https://jewellery-erp.streamlit.app",
+                            },
+                        })
+                        if res.user:
+                            st.success(
+                                f"Account created. Verify the email, then sign in with username: {clean_username}"
+                            )
+                        else:
+                            st.warning("Supabase did not return a user. Check Auth settings.")
+                except Exception as exc:
+                    st.error(str(exc))
+    st.stop()
 
 def setup_company_if_needed(user):
     profile = get_profile(user.id) or {}
@@ -129,6 +173,7 @@ def setup_company_if_needed(user):
         user.company_id = current_company_id
         user.role = profile.get("role") or user.role
         user.full_name = profile.get("full_name") or user.full_name
+        user.username = profile.get("username") or user.username
         st.session_state.user = user
         return
 
@@ -185,10 +230,9 @@ def find_ledger(ledgers: list[dict], exact_name: str) -> str | None:
 
 
 def dashboard(cid: str):
-    page_header("Dashboard", "Sales, stock and accounts — in one controlled view")
+    page_header("Dashboard", "A premium command centre for sales, stock, accounts and market intelligence")
     vouchers = voucher_list(cid, 1000)
     stock = stock_summary(cid)
-    balances = ledger_balances(cid)
     today = date.today().isoformat()
 
     sales_today = sum(
@@ -212,256 +256,232 @@ def dashboard(cid: str):
     rates = india_market_rates()
     updated_at = rates.get("updated_at")
     updated_label = updated_at.strftime("%d %b · %I:%M %p IST") if updated_at else "Live market"
-    metal_source = rates.get("metal_source") or "Market reference"
-    diamond_source = rates.get("diamond_source") or "India diamond benchmark"
+    metal_source = escape(str(rates.get("metal_source") or "Market reference"))
+    diamond_source = escape(str(rates.get("diamond_source") or "India diamond benchmark"))
 
     def rate_value(value: Any, unit: str) -> str:
         if value is None:
             return "Unavailable"
         return f"₹{float(value):,.2f}{unit}"
 
-    st.markdown(
-        f"""
-        <div class="market-head">
-          <div>
-            <div class="section-kicker">INDIA MARKET REFERENCE</div>
-            <div class="section-title">Today’s Jewellery Rates</div>
-          </div>
-          <div class="live-pill"><span></span> {updated_label}</div>
-        </div>
-        <div class="rate-grid">
-          <div class="rate-card gold">
-            <div class="rate-icon">Au</div>
-            <div class="rate-copy">
-              <div class="rate-label">Gold · 24K</div>
-              <div class="rate-value">{rate_value(rates.get("gold_24k"), " / g")}</div>
-              <div class="rate-note">{metal_source}</div>
-            </div>
-          </div>
-          <div class="rate-card gold">
-            <div class="rate-icon">22</div>
-            <div class="rate-copy">
-              <div class="rate-label">Gold · 22K</div>
-              <div class="rate-value">{rate_value(rates.get("gold_22k"), " / g")}</div>
-              <div class="rate-note">{metal_source}</div>
-            </div>
-          </div>
-          <div class="rate-card silver">
-            <div class="rate-icon">Ag</div>
-            <div class="rate-copy">
-              <div class="rate-label">Silver · 999</div>
-              <div class="rate-value">{rate_value(rates.get("silver_999"), " / g")}</div>
-              <div class="rate-note">{metal_source}</div>
-            </div>
-          </div>
-          <div class="rate-card diamond">
-            <div class="rate-icon">◇</div>
-            <div class="rate-copy">
-              <div class="rate-label">Natural Diamond · 1 ct</div>
-              <div class="rate-value">{rate_value(rates.get("diamond_1ct"), " / ct")}</div>
-              <div class="rate-note">{diamond_source} · varies by 4Cs</div>
-            </div>
-          </div>
-        </div>
-        <div class="rate-disclaimer">
-          Market reference only. Gold/silver use India daily jewellery references when available and a live bullion/INR fallback otherwise; GST, local premium and making charges are excluded.
-          Diamond is a 1-carat natural-diamond benchmark, not a universal spot rate.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""
-        <div class="section-kicker kpi-kicker">BUSINESS PULSE</div>
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-label">Today’s Sales</div>
-            <div class="kpi-value">{fmt_inr_compact(sales_today)}</div>
-            <div class="kpi-meta">Posted sales vouchers</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Today’s Purchases</div>
-            <div class="kpi-value">{fmt_inr_compact(purchases_today)}</div>
-            <div class="kpi-meta">Posted purchase vouchers</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Stock Value</div>
-            <div class="kpi-value">{fmt_inr_compact(stock_value)}</div>
-            <div class="kpi-meta">Movement-led inventory value</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Stock Quantity</div>
-            <div class="kpi-value">{pieces:,.3f}</div>
-            <div class="kpi-meta">Pieces / units on hand</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Net Metal Weight</div>
-            <div class="kpi-value">{net_weight:,.3f}<span> g</span></div>
-            <div class="kpi-meta">Across active stock</div>
-          </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    left, right = st.columns([1.7, 1], gap="large")
-
-    with left:
-        st.markdown(
-            '<div class="panel-heading"><div><span>PERFORMANCE</span><strong>Monthly Sales</strong></div><em>Posted vouchers</em></div>',
-            unsafe_allow_html=True,
-        )
-        sales_rows = [
-            v for v in vouchers
-            if v.get("voucher_type") == "SALE" and v.get("status") == "POSTED"
-        ]
-        if sales_rows:
-            sales_df = pd.DataFrame(sales_rows)
-            sales_df["voucher_date"] = pd.to_datetime(sales_df["voucher_date"], errors="coerce")
-            sales_df["amount"] = pd.to_numeric(sales_df["total_amount"], errors="coerce").fillna(0)
-            sales_df = sales_df.dropna(subset=["voucher_date"])
-            if not sales_df.empty:
-                sales_df["month"] = sales_df["voucher_date"].dt.to_period("M").dt.to_timestamp()
-                monthly = sales_df.groupby("month", as_index=False)["amount"].sum().tail(12)
-                chart = (
-                    alt.Chart(monthly)
-                    .mark_area(
-                        line={"color": "#D2A33A", "strokeWidth": 2.3},
-                        color=alt.Gradient(
-                            gradient="linear",
-                            stops=[
-                                alt.GradientStop(color="#D2A33A", offset=0),
-                                alt.GradientStop(color="#F8F3E8", offset=1),
-                            ],
-                            x1=1, x2=1, y1=1, y2=0,
-                        ),
-                        opacity=0.42,
-                    )
-                    .encode(
-                        x=alt.X("month:T", title=None, axis=alt.Axis(format="%b", labelColor="#6C7C6A")),
-                        y=alt.Y("amount:Q", title=None, axis=alt.Axis(format="~s", labelColor="#6C7C6A")),
-                        tooltip=[
-                            alt.Tooltip("month:T", title="Month", format="%B %Y"),
-                            alt.Tooltip("amount:Q", title="Sales", format=",.2f"),
-                        ],
-                    )
-                    .properties(height=260)
-                )
-                st.altair_chart(chart, use_container_width=True)
-            else:
-                st.markdown('<div class="empty-panel">No posted sales yet.</div>', unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="empty-panel">No posted sales yet. Your trend will appear here.</div>', unsafe_allow_html=True)
-
-    with right:
-        st.markdown(
-            '<div class="panel-heading"><div><span>PORTFOLIO</span><strong>Inventory Mix</strong></div><em>By stock value</em></div>',
-            unsafe_allow_html=True,
-        )
-        if stock:
-            mix = pd.DataFrame(stock)
-            mix["metal"] = mix.get("metal", pd.Series(dtype=str)).fillna("Other").replace("", "Other")
-            mix["stock_value"] = pd.to_numeric(mix.get("stock_value", 0), errors="coerce").fillna(0)
-            mix = mix.groupby("metal", as_index=False)["stock_value"].sum()
-            if mix["stock_value"].sum() <= 0:
-                mix["stock_value"] = 1
-            donut = (
-                alt.Chart(mix)
-                .mark_arc(innerRadius=62, outerRadius=100, stroke="#FFFDF8", strokeWidth=2)
-                .encode(
-                    theta=alt.Theta("stock_value:Q"),
-                    color=alt.Color(
-                        "metal:N",
-                        legend=alt.Legend(orient="bottom", labelColor="#496252", title=None),
-                        scale=alt.Scale(range=["#D2A33A", "#103C2B", "#9EA7A0", "#8C5F43", "#E6C66E", "#6C7C6A"]),
-                    ),
-                    tooltip=[
-                        alt.Tooltip("metal:N", title="Metal"),
-                        alt.Tooltip("stock_value:Q", title="Value", format=",.2f"),
-                    ],
-                )
-                .properties(height=260)
-            )
-            st.altair_chart(donut, use_container_width=True)
-        else:
-            st.markdown('<div class="empty-panel">Inventory mix will appear after opening stock.</div>', unsafe_allow_html=True)
-
-    lower_left, lower_right = st.columns([1.65, 0.75], gap="large")
-    with lower_left:
-        st.markdown(
-            '<div class="panel-heading table-title"><div><span>ACTIVITY</span><strong>Recent Vouchers</strong></div><em>Latest postings</em></div>',
-            unsafe_allow_html=True,
-        )
-        if vouchers:
-            df = pd.DataFrame(vouchers)
-            show_cols = [
-                col for col in
-                ["voucher_date", "voucher_number", "voucher_type", "reference_no", "status", "total_amount"]
-                if col in df.columns
+    # Build monthly sales SVG without Altair/JS dependencies.
+    sales_rows = [
+        v for v in vouchers
+        if v.get("voucher_type") == "SALE" and v.get("status") == "POSTED"
+    ]
+    monthly_points: list[tuple[str, float]] = []
+    if sales_rows:
+        sales_df = pd.DataFrame(sales_rows)
+        sales_df["voucher_date"] = pd.to_datetime(sales_df["voucher_date"], errors="coerce")
+        sales_df["amount"] = pd.to_numeric(sales_df["total_amount"], errors="coerce").fillna(0)
+        sales_df = sales_df.dropna(subset=["voucher_date"])
+        if not sales_df.empty:
+            sales_df["month"] = sales_df["voucher_date"].dt.to_period("M").dt.to_timestamp()
+            monthly = sales_df.groupby("month", as_index=False)["amount"].sum().tail(12)
+            monthly_points = [
+                (row["month"].strftime("%b"), float(row["amount"]))
+                for _, row in monthly.iterrows()
             ]
-            recent = df[show_cols].head(12).copy()
-            recent = recent.rename(columns={
-                "voucher_date": "Date",
-                "voucher_number": "Voucher No.",
-                "voucher_type": "Type",
-                "reference_no": "Reference",
-                "status": "Status",
-                "total_amount": "Amount",
-            })
-            st.dataframe(
-                recent,
-                use_container_width=True,
-                hide_index=True,
-                height=min(420, 48 + len(recent) * 35),
-            )
-        else:
-            st.markdown('<div class="empty-panel">No vouchers posted yet.</div>', unsafe_allow_html=True)
 
-    with lower_right:
-        attention = []
-        for item in stock:
-            qty = float(item.get("quantity") or 0)
-            net = float(item.get("net_weight") or 0)
-            mode = (item.get("tracking_mode") or "").upper()
-            needs_attention = (
-                mode in ("PIECE", "QUANTITY") and 0 < qty <= 1
-            ) or (
-                mode == "WEIGHT" and 0 < net <= 10
+    if monthly_points:
+        width, height = 720, 245
+        left_pad, right_pad, top_pad, bottom_pad = 30, 18, 20, 34
+        max_value = max(value for _, value in monthly_points) or 1.0
+        usable_w = width - left_pad - right_pad
+        usable_h = height - top_pad - bottom_pad
+        count = len(monthly_points)
+        points = []
+        labels = []
+        for i, (label, value) in enumerate(monthly_points):
+            x = left_pad + (usable_w * i / max(count - 1, 1))
+            y = top_pad + usable_h * (1 - value / max_value)
+            points.append((x, y))
+            labels.append(
+                f'<text x="{x:.1f}" y="{height - 10}" text-anchor="middle" class="svg-axis">{label}</text>'
             )
-            if needs_attention:
-                attention.append(item)
-
-        st.markdown(
-            f"""
-            <div class="attention-card">
-              <div class="attention-top">
-                <div>
-                  <span>ATTENTION</span>
-                  <strong>Stock Watch</strong>
-                </div>
-                <div class="attention-count">{len(attention)}</div>
-              </div>
-              <p>Items at low on-hand levels based on their tracking mode.</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
+        polyline = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+        area_path = (
+            f"M {points[0][0]:.1f} {height-bottom_pad:.1f} "
+            + " ".join(f"L {x:.1f} {y:.1f}" for x, y in points)
+            + f" L {points[-1][0]:.1f} {height-bottom_pad:.1f} Z"
         )
-        if attention:
-            for item in attention[:5]:
-                label = f"{item.get('item_code') or ''} · {item.get('item_name') or ''}"
-                value = (
-                    f"{float(item.get('net_weight') or 0):,.3f} g"
-                    if (item.get("tracking_mode") or "").upper() == "WEIGHT"
-                    else f"{float(item.get('quantity') or 0):,.3f}"
-                )
-                st.markdown(
-                    f'<div class="attention-row"><span>{label}</span><strong>{value}</strong></div>',
-                    unsafe_allow_html=True,
-                )
-        else:
-            st.markdown('<div class="attention-row ok"><span>All clear</span><strong>✓</strong></div>', unsafe_allow_html=True)
+        dots = "".join(
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.5" class="svg-dot"/>'
+            for x, y in points
+        )
+        chart_html = f"""
+        <div class="chart-shell">
+          <svg class="sales-svg" viewBox="0 0 {width} {height}" preserveAspectRatio="none" aria-label="Monthly sales chart">
+            <defs>
+              <linearGradient id="salesFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#D2A33A" stop-opacity=".34"/>
+                <stop offset="100%" stop-color="#D2A33A" stop-opacity=".02"/>
+              </linearGradient>
+            </defs>
+            <line x1="{left_pad}" y1="{top_pad + usable_h*.25:.1f}" x2="{width-right_pad}" y2="{top_pad + usable_h*.25:.1f}" class="svg-grid"/>
+            <line x1="{left_pad}" y1="{top_pad + usable_h*.50:.1f}" x2="{width-right_pad}" y2="{top_pad + usable_h*.50:.1f}" class="svg-grid"/>
+            <line x1="{left_pad}" y1="{top_pad + usable_h*.75:.1f}" x2="{width-right_pad}" y2="{top_pad + usable_h*.75:.1f}" class="svg-grid"/>
+            <path d="{area_path}" fill="url(#salesFill)"/>
+            <polyline points="{polyline}" class="svg-line"/>
+            {dots}
+            {''.join(labels)}
+          </svg>
+        </div>
+        """
+    else:
+        chart_html = '<div class="empty-panel compact-empty">Your monthly sales trend will appear here after the first posted sale.</div>'
 
+    # Build an inventory-value donut with CSS conic-gradient.
+    mix_values: dict[str, float] = {}
+    for item in stock:
+        metal = str(item.get("metal") or "Other").strip() or "Other"
+        value = float(item.get("stock_value") or 0)
+        if value <= 0:
+            value = abs(float(item.get("quantity") or 0))
+        mix_values[metal] = mix_values.get(metal, 0.0) + value
+
+    palette = ["#D2A33A", "#103C2B", "#A4AAA5", "#8C5F43", "#E6C66E", "#6C7C6A"]
+    mix_total = sum(mix_values.values())
+    if mix_total > 0:
+        start_pct = 0.0
+        segments = []
+        legend_items = []
+        for idx, (metal, value) in enumerate(sorted(mix_values.items(), key=lambda kv: kv[1], reverse=True)):
+            pct = value / mix_total * 100
+            end_pct = start_pct + pct
+            color = palette[idx % len(palette)]
+            segments.append(f"{color} {start_pct:.2f}% {end_pct:.2f}%")
+            legend_items.append(
+                f'<div class="mix-legend-row"><span class="mix-swatch" style="background:{color}"></span>'
+                f'<span>{escape(metal)}</span><strong>{pct:.0f}%</strong></div>'
+            )
+            start_pct = end_pct
+        donut_background = ", ".join(segments)
+        donut_html = f"""
+        <div class="mix-wrap">
+          <div class="mix-donut" style="background:conic-gradient({donut_background})">
+            <div class="mix-hole"><span>STOCK</span><strong>{len(stock)}</strong><em>lines</em></div>
+          </div>
+          <div class="mix-legend">{''.join(legend_items[:6])}</div>
+        </div>
+        """
+    else:
+        donut_html = '<div class="empty-panel compact-empty">Inventory mix will appear after opening stock.</div>'
+
+    recent_rows = []
+    for v in vouchers[:10]:
+        amount = fmt_inr_compact(v.get("total_amount") or 0)
+        recent_rows.append(
+            "<tr>"
+            f"<td>{escape(str(v.get('voucher_date') or '—'))}</td>"
+            f"<td>{escape(str(v.get('voucher_number') or '—'))}</td>"
+            f"<td><span class='voucher-chip'>{escape(str(v.get('voucher_type') or '—'))}</span></td>"
+            f"<td>{escape(str(v.get('reference_no') or '—'))}</td>"
+            f"<td class='amount-cell'>{amount}</td>"
+            f"<td><span class='status-chip'>{escape(str(v.get('status') or '—'))}</span></td>"
+            "</tr>"
+        )
+    recent_table = (
+        "<div class='lux-table-wrap'><table class='lux-table'><thead><tr>"
+        "<th>Date</th><th>Voucher</th><th>Type</th><th>Reference</th><th>Amount</th><th>Status</th>"
+        "</tr></thead><tbody>"
+        + ("".join(recent_rows) if recent_rows else "<tr><td colspan='6' class='empty-cell'>No vouchers posted yet.</td></tr>")
+        + "</tbody></table></div>"
+    )
+
+    attention = []
+    for item in stock:
+        qty = float(item.get("quantity") or 0)
+        net = float(item.get("net_weight") or 0)
+        mode = (item.get("tracking_mode") or "").upper()
+        needs_attention = (
+            mode in ("PIECE", "QUANTITY") and 0 < qty <= 1
+        ) or (
+            mode == "WEIGHT" and 0 < net <= 10
+        )
+        if needs_attention:
+            attention.append(item)
+
+    if attention:
+        attention_rows = "".join(
+            (
+                "<div class='attention-row'>"
+                f"<span>{escape(str(item.get('item_code') or ''))} · {escape(str(item.get('item_name') or ''))}</span>"
+                f"<strong>{(f'{float(item.get('net_weight') or 0):,.3f} g' if (item.get('tracking_mode') or '').upper() == 'WEIGHT' else f'{float(item.get('quantity') or 0):,.3f}')}</strong>"
+                "</div>"
+            )
+            for item in attention[:5]
+        )
+    else:
+        attention_rows = "<div class='attention-row ok'><span>All monitored stock levels are clear</span><strong>✓</strong></div>"
+
+    dashboard_html = f"""
+    <section class="dashboard-shell">
+      <div class="market-head">
+        <div>
+          <div class="section-kicker">INDIA MARKET REFERENCE</div>
+          <div class="section-title">Today’s Jewellery Rates</div>
+        </div>
+        <div class="live-pill"><span></span>{updated_label}</div>
+      </div>
+
+      <div class="rate-grid">
+        <article class="rate-card gold">
+          <div class="rate-icon">Au</div>
+          <div><div class="rate-label">Gold · 24K</div><div class="rate-value">{rate_value(rates.get("gold_24k"), " / g")}</div><div class="rate-note">{metal_source}</div></div>
+        </article>
+        <article class="rate-card gold">
+          <div class="rate-icon">22</div>
+          <div><div class="rate-label">Gold · 22K</div><div class="rate-value">{rate_value(rates.get("gold_22k"), " / g")}</div><div class="rate-note">{metal_source}</div></div>
+        </article>
+        <article class="rate-card silver">
+          <div class="rate-icon">Ag</div>
+          <div><div class="rate-label">Silver · 999</div><div class="rate-value">{rate_value(rates.get("silver_999"), " / g")}</div><div class="rate-note">{metal_source}</div></div>
+        </article>
+        <article class="rate-card diamond">
+          <div class="rate-icon">◇</div>
+          <div><div class="rate-label">Natural Diamond · 1 ct</div><div class="rate-value">{rate_value(rates.get("diamond_1ct"), " / ct")}</div><div class="rate-note">{diamond_source} · varies by 4Cs</div></div>
+        </article>
+      </div>
+      <div class="rate-disclaimer">Market reference only. Gold/silver use India daily jewellery references when available and a live bullion/INR fallback otherwise; GST, local premium and making charges are excluded. Diamond is a 1-carat natural-diamond benchmark, not a universal spot rate.</div>
+
+      <div class="section-kicker kpi-kicker">BUSINESS PULSE</div>
+      <div class="kpi-grid">
+        <article class="kpi-card"><div class="kpi-label">Today’s Sales</div><div class="kpi-value">{fmt_inr_compact(sales_today)}</div><div class="kpi-meta">Posted sales vouchers</div></article>
+        <article class="kpi-card"><div class="kpi-label">Today’s Purchases</div><div class="kpi-value">{fmt_inr_compact(purchases_today)}</div><div class="kpi-meta">Posted purchase vouchers</div></article>
+        <article class="kpi-card"><div class="kpi-label">Stock Value</div><div class="kpi-value">{fmt_inr_compact(stock_value)}</div><div class="kpi-meta">Movement-led inventory value</div></article>
+        <article class="kpi-card"><div class="kpi-label">Stock Quantity</div><div class="kpi-value">{pieces:,.3f}</div><div class="kpi-meta">Pieces / units on hand</div></article>
+        <article class="kpi-card"><div class="kpi-label">Net Metal Weight</div><div class="kpi-value">{net_weight:,.3f}<span> g</span></div><div class="kpi-meta">Across active stock</div></article>
+      </div>
+
+      <div class="dashboard-grid dashboard-grid-top">
+        <article class="dashboard-panel">
+          <div class="panel-heading"><div><span>PERFORMANCE</span><strong>Monthly Sales</strong></div><em>Posted vouchers</em></div>
+          {chart_html}
+        </article>
+        <article class="dashboard-panel">
+          <div class="panel-heading"><div><span>PORTFOLIO</span><strong>Inventory Mix</strong></div><em>By stock value</em></div>
+          {donut_html}
+        </article>
+      </div>
+
+      <div class="dashboard-grid dashboard-grid-bottom">
+        <article class="dashboard-panel">
+          <div class="panel-heading"><div><span>ACTIVITY</span><strong>Recent Vouchers</strong></div><em>Latest postings</em></div>
+          {recent_table}
+        </article>
+        <article class="attention-card">
+          <div class="attention-top">
+            <div><span>ATTENTION</span><strong>Stock Watch</strong></div>
+            <div class="attention-count">{len(attention)}</div>
+          </div>
+          <p>Items at low on-hand levels based on their tracking mode.</p>
+          {attention_rows}
+        </article>
+      </div>
+    </section>
+    """
+    st.markdown(dashboard_html, unsafe_allow_html=True)
 
 def masters_page(cid: str):
     page_header("Masters", "Products, categories, locations and accounting ledgers")
@@ -967,7 +987,7 @@ with st.sidebar:
         """,
         unsafe_allow_html=True,
     )
-    st.caption(f"{user.full_name or user.email} · {user.role}")
+    st.caption(f"{user.full_name or user.username or 'User'} · {user.role}")
     nav=st.radio("Menu",["Dashboard","Masters","Opening Stock","Sales Voucher","Purchase Voucher","Accounting Vouchers","Stock Transfer","Inventory","Reports","Admin"],label_visibility="collapsed")
     st.divider()
     if st.button("Sign out",use_container_width=True):
