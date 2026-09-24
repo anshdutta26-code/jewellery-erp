@@ -150,11 +150,15 @@ def inject_css() -> None:
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          background: radial-gradient(circle at 50% 38%, #173f30 0%, #0d2f23 72%);
+          background:
+            url("https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.png")
+            center / cover no-repeat;
           border: 1px solid rgba(230,198,110,.55);
           box-shadow: 0 12px 30px rgba(10,46,34,.14);
           color: var(--srj-gold-light);
         }
+
+        .srj-seal > * { visibility: hidden; }
 
         .srj-monogram {
           font-family: "Cormorant Garamond", Georgia, serif;
@@ -183,6 +187,20 @@ def inject_css() -> None:
           text-align: center;
           margin: .15rem 0 1rem 0;
           color: #E6C66E;
+        }
+
+        .sidebar-brand::before {
+          content: "";
+          display: block;
+          width: 92px;
+          height: 92px;
+          border-radius: 50%;
+          margin: 0 auto .55rem auto;
+          background:
+            url("https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.png")
+            center / cover no-repeat;
+          border: 1px solid rgba(230,198,110,.48);
+          box-shadow: 0 8px 18px rgba(0,0,0,.16);
         }
 
         .sidebar-monogram {
