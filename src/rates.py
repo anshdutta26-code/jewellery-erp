@@ -46,6 +46,42 @@ def _metal_usd_oz(symbol: str) -> float:
     raise RuntimeError(f"No price returned for {symbol}")
 
 
+def _india_daily_gold_silver() -> tuple[float | None, float | None, float | None]:
+    """Best-effort India daily jewellery reference from public market pages."""
+    gold_24 = gold_22 = silver = None
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 Chrome/140 Safari/537.36"
+        )
+    }
+
+    try:
+        response = requests.get("https://www.goodreturns.in/gold-rates/", timeout=8, headers=headers)
+        response.raise_for_status()
+        text = unescape(response.text)
+        m24 = re.search(r"₹\s*([\d,]+)\s*per gram for 24 karat", text, flags=re.I)
+        m22 = re.search(r"₹\s*([\d,]+)\s*per gram for 22 karat", text, flags=re.I)
+        if m24:
+            gold_24 = float(m24.group(1).replace(",", ""))
+        if m22:
+            gold_22 = float(m22.group(1).replace(",", ""))
+    except Exception:
+        pass
+
+    try:
+        response = requests.get("https://www.goodreturns.in/silver-rates/", timeout=8, headers=headers)
+        response.raise_for_status()
+        text = unescape(response.text)
+        ms = re.search(r"silver in India today is\s*₹\s*([\d,]+)\s*per gram", text, flags=re.I)
+        if ms:
+            silver = float(ms.group(1).replace(",", ""))
+    except Exception:
+        pass
+
+    return gold_24, gold_22, silver
+
+
 def _diamond_india_1ct() -> tuple[float | None, str]:
     """
     Returns the current India-market average for a 1 carat natural diamond.
@@ -93,21 +129,29 @@ def india_market_rates() -> dict[str, Any]:
         "status": "live",
     }
 
-    try:
-        fx = _usd_inr()
-        gold_usd_oz = _metal_usd_oz("XAU")
-        silver_usd_oz = _metal_usd_oz("XAG")
+    india_24, india_22, india_silver = _india_daily_gold_silver()
+    if india_24 and india_22 and india_silver:
+        result["gold_24k"] = round(india_24, 2)
+        result["gold_22k"] = round(india_22, 2)
+        result["silver_999"] = round(india_silver, 2)
+        result["metal_source"] = "India daily jewellery reference"
+    else:
+        try:
+            fx = _usd_inr()
+            gold_usd_oz = _metal_usd_oz("XAU")
+            silver_usd_oz = _metal_usd_oz("XAG")
 
-        gold_24 = gold_usd_oz * fx / TROY_OUNCE_GRAMS
-        silver_999 = silver_usd_oz * fx / TROY_OUNCE_GRAMS
+            gold_24 = gold_usd_oz * fx / TROY_OUNCE_GRAMS
+            silver_999 = silver_usd_oz * fx / TROY_OUNCE_GRAMS
 
-        result["gold_24k"] = round(gold_24, 2)
-        result["gold_22k"] = round(gold_24 * 22 / 24, 2)
-        result["silver_999"] = round(silver_999, 2)
-        result["usd_inr"] = round(fx, 4)
-    except Exception as exc:
-        result["status"] = "partial"
-        result["metal_error"] = str(exc)
+            result["gold_24k"] = round(gold_24, 2)
+            result["gold_22k"] = round(gold_24 * 22 / 24, 2)
+            result["silver_999"] = round(silver_999, 2)
+            result["usd_inr"] = round(fx, 4)
+            result["metal_source"] = "Live bullion + INR conversion fallback"
+        except Exception as exc:
+            result["status"] = "partial"
+            result["metal_error"] = str(exc)
 
     diamond, source = _diamond_india_1ct()
     result["diamond_1ct"] = diamond
