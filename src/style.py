@@ -14,7 +14,7 @@ def inject_css() -> None:
     st.markdown(
         """
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Montserrat:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&family=Montserrat:wght@400;500;600;700&display=swap');
 
         :root {
           --srj-green: #103C2B;
@@ -424,12 +424,475 @@ def inject_css() -> None:
 
         .muted { color: var(--srj-sage); }
 
+        /* Restore Streamlit's Material icons after global font branding. */
+        [data-testid="stIconMaterial"],
+        .material-symbols-rounded,
+        span[class*="material-symbols"] {
+          font-family: "Material Symbols Rounded" !important;
+          font-weight: normal !important;
+          font-style: normal !important;
+          letter-spacing: normal !important;
+          text-transform: none !important;
+          white-space: nowrap !important;
+          word-wrap: normal !important;
+          direction: ltr !important;
+          -webkit-font-feature-settings: "liga" !important;
+          -webkit-font-smoothing: antialiased !important;
+        }
+
+        /* Keep Streamlit chrome discreet; sidebar opener remains available. */
+        [data-testid="stToolbar"] {
+          opacity: .32;
+          transition: opacity .18s ease;
+        }
+        [data-testid="stToolbar"]:hover { opacity: 1; }
+        #MainMenu, footer { visibility: hidden; }
+
+        /* Sidebar: luxury navigation, no default radio bullets. */
+        [data-testid="stSidebar"] {
+          width: 300px !important;
+          min-width: 300px !important;
+        }
+
+        [data-testid="stSidebar"] [data-baseweb="radio"] > div:first-child {
+          display: none !important;
+        }
+
+        [data-testid="stSidebar"] [role="radiogroup"] label {
+          min-height: 42px;
+          display: flex !important;
+          align-items: center !important;
+          padding: .56rem .78rem !important;
+          margin: .08rem 0;
+          border-radius: 7px !important;
+          font-size: .88rem;
+          letter-spacing: .01em;
+        }
+
+        [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) {
+          background: linear-gradient(90deg, rgba(210,163,58,.18), rgba(210,163,58,.07)) !important;
+          border: 1px solid rgba(230,198,110,.48) !important;
+          box-shadow: inset 3px 0 0 #D2A33A !important;
+        }
+
+        .sidebar-brand {
+          padding: .9rem .75rem .2rem;
+          margin-bottom: .45rem;
+        }
+
+        .sidebar-monogram {
+          font-size: 3.1rem;
+          color: #E6C66E;
+        }
+
+        .sidebar-name {
+          font-size: 1rem;
+          line-height: 1.05;
+          letter-spacing: .12em;
+          color: #E6C66E;
+        }
+
+        .sidebar-jewels {
+          margin-top: .28rem;
+          font-size: .50rem;
+          letter-spacing: .28em;
+        }
+
+        /* Approved dashboard composition */
+        .market-head {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 1rem;
+          margin: .2rem 0 .8rem;
+        }
+
+        .section-kicker {
+          color: #B88A27;
+          font-size: .65rem;
+          letter-spacing: .22em;
+          font-weight: 700;
+          text-transform: uppercase;
+          margin-bottom: .16rem;
+        }
+
+        .section-title {
+          color: #0A2E22;
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 1.72rem;
+          line-height: 1;
+          font-weight: 700;
+        }
+
+        .live-pill {
+          flex: 0 0 auto;
+          display: inline-flex;
+          align-items: center;
+          gap: .42rem;
+          padding: .36rem .62rem;
+          border: 1px solid rgba(16,60,43,.15);
+          border-radius: 999px;
+          background: rgba(255,253,248,.78);
+          color: #6C7C6A;
+          font-size: .62rem;
+          letter-spacing: .045em;
+          white-space: nowrap;
+        }
+
+        .live-pill span {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #2D8C5B;
+          box-shadow: 0 0 0 4px rgba(45,140,91,.10);
+        }
+
+        .rate-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .rate-card {
+          display: flex;
+          align-items: center;
+          gap: .85rem;
+          min-height: 108px;
+          padding: .9rem 1rem;
+          border: 1px solid rgba(210,163,58,.30);
+          border-radius: 12px;
+          background:
+            linear-gradient(145deg, rgba(255,253,248,.97), rgba(248,243,232,.87));
+          box-shadow: 0 8px 22px rgba(10,46,34,.045);
+        }
+
+        .rate-card .rate-icon {
+          display: grid;
+          place-items: center;
+          width: 46px;
+          height: 46px;
+          flex: 0 0 46px;
+          border-radius: 50%;
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 1.15rem;
+          font-weight: 700;
+          background: #103C2B;
+          color: #E6C66E;
+          border: 1px solid rgba(210,163,58,.55);
+        }
+
+        .rate-card.silver .rate-icon {
+          background: #E7E9E5;
+          color: #3D4B43;
+          border-color: #C9CFC9;
+        }
+
+        .rate-card.diamond .rate-icon {
+          background: #FFFDF8;
+          color: #103C2B;
+          border-color: rgba(16,60,43,.22);
+          font-size: 1.55rem;
+        }
+
+        .rate-label {
+          color: #6C7C6A;
+          font-size: .61rem;
+          font-weight: 700;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        .rate-value {
+          margin-top: .18rem;
+          color: #0A2E22;
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 1.37rem;
+          font-weight: 700;
+          line-height: 1.05;
+        }
+
+        .rate-note {
+          margin-top: .17rem;
+          color: #849086;
+          font-size: .59rem;
+        }
+
+        .rate-disclaimer {
+          color: #829086;
+          font-size: .58rem;
+          line-height: 1.45;
+          margin: .48rem 0 1.15rem;
+        }
+
+        .kpi-kicker { margin: .15rem 0 .55rem; }
+
+        .kpi-grid {
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 12px;
+          margin-bottom: 1.35rem;
+        }
+
+        .kpi-card {
+          position: relative;
+          min-height: 128px;
+          padding: .95rem 1rem;
+          border: 1px solid rgba(210,163,58,.30);
+          border-radius: 12px;
+          overflow: hidden;
+          background: rgba(255,253,248,.95);
+          box-shadow: 0 8px 22px rgba(10,46,34,.045);
+        }
+
+        .kpi-card::after {
+          content: "";
+          position: absolute;
+          width: 80px;
+          height: 80px;
+          right: -40px;
+          top: -40px;
+          border-radius: 50%;
+          border: 1px solid rgba(210,163,58,.13);
+          box-shadow: 0 0 0 14px rgba(210,163,58,.025);
+        }
+
+        .kpi-label {
+          color: #6C7C6A;
+          font-size: .61rem;
+          letter-spacing: .14em;
+          text-transform: uppercase;
+          font-weight: 700;
+        }
+
+        .kpi-value {
+          margin-top: .42rem;
+          color: #0A2E22;
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 2rem;
+          font-weight: 700;
+          line-height: .95;
+        }
+
+        .kpi-value span {
+          font-family: "Montserrat", sans-serif;
+          font-size: .78rem;
+          font-weight: 600;
+          color: #6C7C6A;
+        }
+
+        .kpi-meta {
+          margin-top: .55rem;
+          color: #8A948C;
+          font-size: .58rem;
+          line-height: 1.25;
+        }
+
+        .panel-heading {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 1rem;
+          margin: .2rem 0 .6rem;
+          padding: 0 .05rem;
+        }
+
+        .panel-heading div {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .panel-heading span {
+          color: #B88A27;
+          font-size: .59rem;
+          font-weight: 700;
+          letter-spacing: .17em;
+        }
+
+        .panel-heading strong {
+          color: #0A2E22;
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 1.45rem;
+          line-height: 1;
+        }
+
+        .panel-heading em {
+          color: #88948C;
+          font-style: normal;
+          font-size: .58rem;
+        }
+
+        [data-testid="stVegaLiteChart"] {
+          background: rgba(255,253,248,.92);
+          border: 1px solid rgba(210,163,58,.24);
+          border-radius: 12px;
+          padding: .55rem;
+          box-shadow: 0 8px 22px rgba(10,46,34,.04);
+        }
+
+        .empty-panel {
+          display: grid;
+          place-items: center;
+          min-height: 275px;
+          padding: 1rem;
+          border-radius: 12px;
+          border: 1px dashed rgba(210,163,58,.34);
+          background: rgba(255,253,248,.72);
+          color: #7E8A81;
+          font-size: .78rem;
+          text-align: center;
+        }
+
+        .table-title { margin-top: 1rem; }
+
+        .attention-card {
+          margin-top: 1rem;
+          padding: 1rem;
+          border-radius: 12px;
+          background:
+            radial-gradient(circle at 95% 0%, rgba(230,198,110,.10), transparent 8rem),
+            linear-gradient(135deg, #123E2C 0%, #0A2E22 100%);
+          color: #FFF8E6;
+          border: 1px solid rgba(210,163,58,.52);
+          box-shadow: 0 10px 24px rgba(10,46,34,.09);
+        }
+
+        .attention-top {
+          display: flex;
+          align-items: start;
+          justify-content: space-between;
+          gap: 1rem;
+        }
+
+        .attention-top div:first-child {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .attention-top span {
+          color: #E6C66E;
+          font-size: .58rem;
+          font-weight: 700;
+          letter-spacing: .17em;
+        }
+
+        .attention-top strong {
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 1.45rem;
+          line-height: 1;
+        }
+
+        .attention-count {
+          display: grid;
+          place-items: center;
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: rgba(210,163,58,.14);
+          border: 1px solid rgba(230,198,110,.42);
+          color: #E6C66E;
+          font-weight: 700;
+        }
+
+        .attention-card p {
+          margin: .7rem 0 0;
+          color: rgba(255,248,230,.64);
+          font-size: .66rem;
+          line-height: 1.45;
+        }
+
+        .attention-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: .8rem;
+          margin-top: .45rem;
+          padding: .62rem .72rem;
+          border-radius: 8px;
+          border: 1px solid rgba(210,163,58,.23);
+          background: rgba(255,253,248,.80);
+          color: #496252;
+          font-size: .64rem;
+        }
+
+        .attention-row strong {
+          color: #0A2E22;
+          white-space: nowrap;
+        }
+
+        .attention-row.ok strong { color: #2D8C5B; }
+
+        @media (max-width: 1180px) {
+          .rate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 900px) {
+          [data-testid="stSidebar"] {
+            width: min(82vw, 320px) !important;
+            min-width: min(82vw, 320px) !important;
+          }
+          .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .kpi-card { min-height: 116px; }
+          .kpi-value { font-size: 1.75rem; }
+        }
+
         @media (max-width: 800px) {
-          .block-container { padding-top: .8rem; }
-          .login-brand { padding-top: 4.6rem; }
-          .erp-title { font-size: 1.95rem; }
+          .block-container {
+            padding-top: 3.7rem;
+            padding-left: .85rem;
+            padding-right: .85rem;
+          }
+          .login-brand { padding-top: 1.2rem; }
+          .erp-hero {
+            padding: .95rem 1rem;
+            margin-bottom: .85rem;
+          }
+          .erp-title { font-size: 1.92rem; }
+          .erp-sub { font-size: .73rem; }
           .login-brand .headline { font-size: 2.1rem; }
+          .market-head {
+            align-items: start;
+            flex-direction: column;
+            gap: .45rem;
+          }
+          .rate-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px;
+          }
+          .rate-card {
+            min-height: 104px;
+            padding: .75rem .7rem;
+            gap: .6rem;
+          }
+          .rate-card .rate-icon {
+            width: 38px;
+            height: 38px;
+            flex-basis: 38px;
+            font-size: 1rem;
+          }
+          .rate-value { font-size: 1.08rem; }
+          .rate-note { font-size: .52rem; }
+          .kpi-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px;
+          }
+          .kpi-card {
+            min-height: 106px;
+            padding: .78rem .75rem;
+          }
+          .kpi-value { font-size: 1.55rem; }
+          .kpi-meta { font-size: .52rem; }
+          .panel-heading strong { font-size: 1.25rem; }
+          .panel-heading em { display: none; }
           div[data-testid="stMetric"] { min-height: 96px; }
+        }
+
+        @media (max-width: 480px) {
+          .rate-grid { grid-template-columns: 1fr; }
+          .kpi-grid { grid-template-columns: 1fr 1fr; }
+          .kpi-card:last-child { grid-column: span 2; }
+          .section-title { font-size: 1.48rem; }
+          .rate-disclaimer { font-size: .54rem; }
         }
         </style>
         """,
