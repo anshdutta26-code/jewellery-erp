@@ -212,6 +212,8 @@ def dashboard(cid: str):
     rates = india_market_rates()
     updated_at = rates.get("updated_at")
     updated_label = updated_at.strftime("%d %b · %I:%M %p IST") if updated_at else "Live market"
+    metal_source = rates.get("metal_source") or "Market reference"
+    diamond_source = rates.get("diamond_source") or "India diamond benchmark"
 
     def rate_value(value: Any, unit: str) -> str:
         if value is None:
@@ -233,7 +235,7 @@ def dashboard(cid: str):
             <div class="rate-copy">
               <div class="rate-label">Gold · 24K</div>
               <div class="rate-value">{rate_value(rates.get("gold_24k"), " / g")}</div>
-              <div class="rate-note">Live bullion reference</div>
+              <div class="rate-note">{metal_source}</div>
             </div>
           </div>
           <div class="rate-card gold">
@@ -241,7 +243,7 @@ def dashboard(cid: str):
             <div class="rate-copy">
               <div class="rate-label">Gold · 22K</div>
               <div class="rate-value">{rate_value(rates.get("gold_22k"), " / g")}</div>
-              <div class="rate-note">Jewellery purity reference</div>
+              <div class="rate-note">{metal_source}</div>
             </div>
           </div>
           <div class="rate-card silver">
@@ -249,7 +251,7 @@ def dashboard(cid: str):
             <div class="rate-copy">
               <div class="rate-label">Silver · 999</div>
               <div class="rate-value">{rate_value(rates.get("silver_999"), " / g")}</div>
-              <div class="rate-note">Live bullion reference</div>
+              <div class="rate-note">{metal_source}</div>
             </div>
           </div>
           <div class="rate-card diamond">
@@ -257,13 +259,13 @@ def dashboard(cid: str):
             <div class="rate-copy">
               <div class="rate-label">Natural Diamond · 1 ct</div>
               <div class="rate-value">{rate_value(rates.get("diamond_1ct"), " / ct")}</div>
-              <div class="rate-note">India benchmark · varies by 4Cs</div>
+              <div class="rate-note">{diamond_source} · varies by 4Cs</div>
             </div>
           </div>
         </div>
         <div class="rate-disclaimer">
-          Market reference only. Gold/silver are converted live bullion values before GST, local premium and making charges.
-          Diamond is a 1-carat natural-diamond market benchmark, not a universal spot rate.
+          Market reference only. Gold/silver use India daily jewellery references when available and a live bullion/INR fallback otherwise; GST, local premium and making charges are excluded.
+          Diamond is a 1-carat natural-diamond benchmark, not a universal spot rate.
         </div>
         """,
         unsafe_allow_html=True,
