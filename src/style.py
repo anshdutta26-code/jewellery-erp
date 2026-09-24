@@ -81,6 +81,74 @@ def inject_css() -> None:
           color: var(--srj-green) !important;
         }
 
+
+        .srj-seal {
+          width: 156px;
+          height: 156px;
+          border-radius: 50%;
+          margin: .15rem auto .85rem auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: radial-gradient(circle at 50% 38%, #173f30 0%, #0d2f23 72%);
+          border: 1px solid rgba(230,198,110,.55);
+          box-shadow: 0 12px 30px rgba(10,46,34,.14);
+          color: var(--srj-gold-light);
+        }
+
+        .srj-monogram {
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 3.05rem;
+          line-height: .78;
+          font-weight: 600;
+          letter-spacing: -.06em;
+        }
+
+        .srj-name {
+          margin-top: .55rem;
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 1.02rem;
+          font-weight: 700;
+          letter-spacing: .11em;
+        }
+
+        .srj-jewels {
+          font-size: .55rem;
+          letter-spacing: .28em;
+          margin-left: .28em;
+          margin-top: .08rem;
+        }
+
+        .sidebar-brand {
+          text-align: center;
+          margin: .15rem 0 1rem 0;
+          color: #E6C66E;
+        }
+
+        .sidebar-monogram {
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 2.6rem;
+          font-weight: 600;
+          line-height: .9;
+          letter-spacing: -.05em;
+        }
+
+        .sidebar-name {
+          font-family: "Cormorant Garamond", Georgia, serif;
+          font-size: 1.05rem;
+          font-weight: 700;
+          letter-spacing: .10em;
+          margin-top: .28rem;
+        }
+
+        .sidebar-jewels {
+          font-size: .52rem;
+          letter-spacing: .24em;
+          margin-top: .08rem;
+          color: rgba(248,232,179,.82);
+        }
+
         /* Sidebar */
         [data-testid="stSidebar"] {
           background:
