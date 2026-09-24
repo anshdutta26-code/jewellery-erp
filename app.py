@@ -91,13 +91,11 @@ def require_user():
             username = st.text_input(
                 "Username",
                 placeholder="Enter your username",
-                autocomplete="username",
             )
             password = st.text_input(
                 "Password",
                 type="password",
                 placeholder="Enter your password",
-                autocomplete="current-password",
             )
             submit = st.form_submit_button("Sign in", type="primary", use_container_width=True)
 
@@ -122,7 +120,6 @@ def require_user():
                 "Password",
                 type="password",
                 key="signup_password",
-                autocomplete="new-password",
             )
             create = st.form_submit_button("Create account", use_container_width=True)
 
