@@ -47,6 +47,19 @@ def inject_css() -> None:
         }
 
         /* Header / titles */
+        .erp-hero {
+          margin: 0 0 1.15rem 0;
+          padding: 1.2rem 1.35rem;
+          border: 1px solid rgba(210,163,58,.48);
+          border-radius: 10px;
+          background: linear-gradient(135deg, #123E2C 0%, #0A2E22 100%);
+          box-shadow: 0 10px 24px rgba(10,46,34,.08);
+        }
+
+        .erp-hero .srj-eyebrow { color: #E6C66E; }
+        .erp-hero .erp-title { color: #FFF8E6; margin-bottom: .28rem; }
+        .erp-hero .erp-sub { color: rgba(255,248,230,.72); margin-bottom: 0; }
+
         .srj-eyebrow {
           color: var(--srj-gold);
           font-size: .70rem;
@@ -363,7 +376,14 @@ def inject_css() -> None:
 
 
 def page_header(title: str, subtitle: str = "") -> None:
-    st.markdown('<div class="srj-eyebrow">SHUBHRAJ JEWELS · ERP</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="erp-title">{title}</div>', unsafe_allow_html=True)
-    if subtitle:
-        st.markdown(f'<div class="erp-sub">{subtitle}</div>', unsafe_allow_html=True)
+    sub_html = f'<div class="erp-sub">{subtitle}</div>' if subtitle else ""
+    st.markdown(
+        f"""
+        <div class="erp-hero">
+          <div class="srj-eyebrow">SHUBHRAJ JEWELS · ERP</div>
+          <div class="erp-title">{title}</div>
+          {sub_html}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
