@@ -88,7 +88,14 @@ def require_user():
             create = st.form_submit_button("Create account", use_container_width=True)
         if create:
             try:
-                res = auth_client().auth.sign_up({"email": email2.strip(), "password": password2, "options": {"data": {"full_name": full_name}}})
+                res = auth_client().auth.sign_up({
+                    "email": email2.strip(),
+                    "password": password2,
+                    "options": {
+                        "data": {"full_name": full_name},
+                        "email_redirect_to": "https://jewellery-erp.streamlit.app",
+                    },
+                })
                 if res.user:
                     st.success("Account created. If email confirmation is enabled in Supabase, confirm the email, then sign in.")
                 else:
