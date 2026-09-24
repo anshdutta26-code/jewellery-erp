@@ -50,7 +50,19 @@ def require_user():
     if "user" in st.session_state:
         return st.session_state.user
 
-    page_header("Shubhraj Jewels ERP", "Accounts, inventory and jewellery operations")
+    l1, l2, l3 = st.columns([1, .42, 1])
+    with l2:
+        st.image("assets/srj_logo.png", use_container_width=True)
+    st.markdown(
+        """
+        <div class="login-brand">
+          <div class="tag">HERITAGE · CRAFTSMANSHIP · CONTROL</div>
+          <div class="headline">Shubhraj Jewels ERP</div>
+          <div class="strap">Accounts, inventory and jewellery operations in one secure system.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     tab1, tab2 = st.tabs(["Sign in", "Create first account"])
     with tab1:
         with st.form("login"):
@@ -95,7 +107,7 @@ def setup_company_if_needed(user):
 
     page_header("Create your company", "You can edit these details later. Product master and opening stock can remain empty.")
     with st.form("company_setup"):
-        name = st.text_input("Company / Firm Name *")
+        name = st.text_input("Company / Firm Name *", value="Shubhraj Jewels")
         legal = st.text_input("Legal Name")
         gstin = st.text_input("GSTIN")
         pan = st.text_input("PAN")
@@ -146,7 +158,7 @@ def find_ledger(ledgers: list[dict], exact_name: str) -> str | None:
 
 
 def dashboard(cid: str):
-    page_header("Dashboard", "Business position at a glance")
+    page_header("Dashboard", "Sales, stock and accounts — in one controlled view")
     vouchers = voucher_list(cid, 1000)
     stock = stock_summary(cid)
     balances = ledger_balances(cid)
@@ -676,7 +688,16 @@ def admin_page(cid: str, user):
 user=require_user(); setup_company_if_needed(user); cid=user.company_id
 comp=company(cid) or {"name":"Shubhraj Jewels"}
 with st.sidebar:
-    st.markdown(f"### 💎 {comp.get('name','Shubhraj Jewels')}")
+    st.image("assets/srj_logo.png", width=118)
+    st.markdown(
+        f"""
+        <div style="text-align:center;color:#E6C66E;font-family:'Cormorant Garamond',Georgia,serif;
+                    font-size:1.18rem;font-weight:700;letter-spacing:.08em;margin:-.3rem 0 .25rem 0;">
+            {comp.get('name','Shubhraj Jewels').upper()}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.caption(f"{user.full_name or user.email} · {user.role}")
     nav=st.radio("Menu",["Dashboard","Masters","Opening Stock","Sales Voucher","Purchase Voucher","Accounting Vouchers","Stock Transfer","Inventory","Reports","Admin"],label_visibility="collapsed")
     st.divider()
