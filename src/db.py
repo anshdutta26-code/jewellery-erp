@@ -25,6 +25,14 @@ def _secret(name: str) -> str:
     return str(value)
 
 
+def _optional_secret(name: str) -> str | None:
+    try:
+        value = st.secrets[name]
+    except Exception:
+        value = None
+    return str(value) if value else None
+
+
 DEFAULT_SUPABASE_URL = "https://uqqokyjckmezqhhxnmri.supabase.co"
 DEFAULT_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcW9reWpja21lenFoaHhubXJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyNTI5MDMsImV4cCI6MjEwNTgyODkwM30.GytunIVaZo9wOh2ECfhZ4vx2YPvRIgjLA_SKfARQCGU"
 
@@ -38,7 +46,13 @@ def auth_client() -> Client:
 
 @st.cache_resource(show_spinner=False)
 def db_client() -> Client:
-    return create_client(_secret("SUPABASE_URL"), _secret("SUPABASE_SERVICE_ROLE_KEY"))
+    server_key = _optional_secret("SUPABASE_SECRET_KEY") or _optional_secret("SUPABASE_SERVICE_ROLE_KEY")
+    if not server_key:
+        raise RuntimeError(
+            "Missing server key. Add SUPABASE_SECRET_KEY in Streamlit Secrets "
+            "(recommended) or the legacy SUPABASE_SERVICE_ROLE_KEY."
+        )
+    return create_client(DEFAULT_SUPABASE_URL, server_key)
 
 
 def sign_in(email: str, password: str) -> SessionUser:
@@ -122,9 +136,9 @@ def create_company_for_user(user_id: str, company_payload: dict[str, Any]) -> st
         admin_db.table("profiles").select("user_id").eq("user_id", user_id).limit(1).execute()
     except Exception as exc:
         raise RuntimeError(
-            "The Streamlit SUPABASE_SERVICE_ROLE_KEY is missing or invalid. "
-            "Open Streamlit Manage app → Settings → Secrets and replace it with the "
-            "Supabase Jewellery ERP service_role/secret key."
+            "The Streamlit Supabase server key is missing or invalid. "
+            "Create a NEW Supabase Secret key and save it in Streamlit as "
+            "SUPABASE_SECRET_KEY. Legacy SUPABASE_SERVICE_ROLE_KEY is also supported."
         ) from exc
 
     created = admin_db.table("companies").insert(company_payload).execute().data
