@@ -51,12 +51,14 @@ def require_user():
     if "user" in st.session_state:
         return st.session_state.user
 
-    l1, l2, l3 = st.columns([1, .42, 1])
-    with l2:
-        st.image("assets/srj_logo.png", use_container_width=True)
     st.markdown(
         """
         <div class="login-brand">
+          <div class="srj-seal" aria-label="Shubhraj Jewels">
+            <div class="srj-monogram">SRJ</div>
+            <div class="srj-name">SHUBHRAJ</div>
+            <div class="srj-jewels">JEWELS</div>
+          </div>
           <div class="tag">HERITAGE · CRAFTSMANSHIP · CONTROL</div>
           <div class="headline">Shubhraj Jewels ERP</div>
           <div class="strap">Accounts, inventory and jewellery operations in one secure system.</div>
@@ -689,12 +691,12 @@ def admin_page(cid: str, user):
 user=require_user(); setup_company_if_needed(user); cid=user.company_id
 comp=company(cid) or {"name":"Shubhraj Jewels"}
 with st.sidebar:
-    st.image("assets/srj_logo.png", width=118)
     st.markdown(
         f"""
-        <div style="text-align:center;color:#E6C66E;font-family:'Cormorant Garamond',Georgia,serif;
-                    font-size:1.18rem;font-weight:700;letter-spacing:.08em;margin:-.3rem 0 .25rem 0;">
-            {comp.get('name','Shubhraj Jewels').upper()}
+        <div class="sidebar-brand">
+          <div class="sidebar-monogram">SRJ</div>
+          <div class="sidebar-name">{comp.get('name','Shubhraj Jewels').upper()}</div>
+          <div class="sidebar-jewels">JEWELS ERP</div>
         </div>
         """,
         unsafe_allow_html=True,
