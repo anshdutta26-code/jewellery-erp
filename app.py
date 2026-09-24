@@ -31,7 +31,7 @@ from src.db import (
 from src.rates import india_market_rates
 from src.style import inject_css, page_header
 
-st.set_page_config(page_title="Shubhraj Jewels ERP", page_icon="💎", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Shubhraj Jewels ERP", page_icon="💎", layout="wide", initial_sidebar_state="auto")
 inject_css()
 
 
@@ -514,6 +514,10 @@ def dashboard(cid: str):
             <em>SHUBHRAJ JEWELS</em>
           </aside>
         </section>
+        <footer class="erp-footer">
+          <div><strong>SHUBHRAJ JEWELS ERP</strong><span>Version 1.0.0</span></div>
+          <div>Secure <b>·</b> Reliable <b>·</b> Built for a Brighter Tomorrow</div>
+        </footer>
         """,
         unsafe_allow_html=True,
     )
