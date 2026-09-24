@@ -32,11 +32,27 @@ def inject_css() -> None:
         }
 
         .stApp {
-          background:
-            radial-gradient(circle at 10% 14%, rgba(210,163,58,.10), transparent 18rem),
-            radial-gradient(circle at 92% 18%, rgba(16,60,43,.07), transparent 20rem),
-            radial-gradient(circle at 82% 85%, rgba(210,163,58,.07), transparent 22rem),
-            linear-gradient(180deg, #FFFDF9 0%, #F8F3E8 100%);
+          background-color: #FBF6EB;
+          background-image:
+            repeating-linear-gradient(
+              45deg,
+              rgba(210,163,58,.045) 0px,
+              rgba(210,163,58,.045) 1px,
+              transparent 1px,
+              transparent 52px
+            ),
+            repeating-linear-gradient(
+              -45deg,
+              rgba(16,60,43,.028) 0px,
+              rgba(16,60,43,.028) 1px,
+              transparent 1px,
+              transparent 52px
+            ),
+            radial-gradient(circle at 12% 18%, rgba(210,163,58,.18), transparent 15rem),
+            radial-gradient(circle at 88% 22%, rgba(16,60,43,.11), transparent 20rem),
+            radial-gradient(circle at 82% 82%, rgba(210,163,58,.12), transparent 22rem),
+            linear-gradient(180deg, #FFFDF9 0%, #F7F0E2 100%);
+          background-attachment: fixed;
           color: var(--srj-green-dark);
         }
 
@@ -256,10 +272,29 @@ def inject_css() -> None:
         }
 
         [data-testid="stForm"] {
-          background: rgba(255,253,248,.68);
-          border: 1px solid rgba(210,163,58,.22);
+          position: relative;
+          overflow: hidden;
+          background: rgba(255,253,248,.82);
+          border: 1px solid rgba(210,163,58,.28);
           border-radius: 10px;
           padding: 1rem;
+          box-shadow: 0 12px 28px rgba(10,46,34,.045);
+          backdrop-filter: blur(3px);
+        }
+
+        .stApp [data-testid="stForm"]::before {
+          content: "";
+          position: absolute;
+          width: 150px;
+          height: 150px;
+          right: -75px;
+          bottom: -85px;
+          border: 1px solid rgba(210,163,58,.12);
+          border-radius: 50%;
+          box-shadow:
+            0 0 0 18px rgba(210,163,58,.035),
+            0 0 0 36px rgba(16,60,43,.025);
+          pointer-events: none;
         }
 
         /* Buttons, inspired by website CTA */
@@ -326,9 +361,36 @@ def inject_css() -> None:
 
         /* Login brand */
         .login-brand {
+          position: relative;
           text-align: center;
           max-width: 660px;
           margin: 0 auto .7rem auto;
+          padding: .25rem 1rem .15rem 1rem;
+        }
+
+        .login-brand::before,
+        .login-brand::after {
+          position: absolute;
+          font-family: "Cormorant Garamond", Georgia, serif;
+          color: rgba(210,163,58,.28);
+          line-height: 1;
+          pointer-events: none;
+        }
+
+        .login-brand::before {
+          content: "✦";
+          left: 2%;
+          top: 38%;
+          font-size: 2.4rem;
+        }
+
+        .login-brand::after {
+          content: "◇";
+          right: 1%;
+          top: 20%;
+          font-size: 4.8rem;
+          transform: rotate(12deg);
+          color: rgba(16,60,43,.09);
         }
 
         .login-brand .tag {
