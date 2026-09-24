@@ -5,6 +5,7 @@ from datetime import date, datetime
 from io import BytesIO
 from typing import Any
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 
@@ -26,6 +27,7 @@ from src.db import (
     update,
     voucher_list,
 )
+from src.rates import india_market_rates
 from src.style import inject_css, page_header
 
 st.set_page_config(page_title="Shubhraj Jewels ERP", page_icon="💎", layout="wide", initial_sidebar_state="expanded")
@@ -37,6 +39,21 @@ def fmt_inr(v: Any) -> str:
         return f"₹{float(v or 0):,.2f}"
     except Exception:
         return "₹0.00"
+
+
+def fmt_inr_compact(v: Any) -> str:
+    try:
+        value = float(v or 0)
+    except Exception:
+        value = 0.0
+    av = abs(value)
+    if av >= 10_000_000:
+        return f"₹{value / 10_000_000:,.2f} Cr"
+    if av >= 100_000:
+        return f"₹{value / 100_000:,.2f} L"
+    if av >= 1_000:
+        return f"₹{value / 1_000:,.1f} K"
+    return f"₹{value:,.2f}"
 
 
 def safe_data(executor, default=None):
@@ -174,34 +191,274 @@ def dashboard(cid: str):
     balances = ledger_balances(cid)
     today = date.today().isoformat()
 
-    sales_today = sum(float(v.get("total_amount") or 0) for v in vouchers if v.get("voucher_type") == "SALE" and v.get("voucher_date") == today and v.get("status") == "POSTED")
-    purchases_today = sum(float(v.get("total_amount") or 0) for v in vouchers if v.get("voucher_type") == "PURCHASE" and v.get("voucher_date") == today and v.get("status") == "POSTED")
+    sales_today = sum(
+        float(v.get("total_amount") or 0)
+        for v in vouchers
+        if v.get("voucher_type") == "SALE"
+        and v.get("voucher_date") == today
+        and v.get("status") == "POSTED"
+    )
+    purchases_today = sum(
+        float(v.get("total_amount") or 0)
+        for v in vouchers
+        if v.get("voucher_type") == "PURCHASE"
+        and v.get("voucher_date") == today
+        and v.get("status") == "POSTED"
+    )
     stock_value = sum(float(x.get("stock_value") or 0) for x in stock)
     pieces = sum(float(x.get("quantity") or 0) for x in stock)
     net_weight = sum(float(x.get("net_weight") or 0) for x in stock)
 
-    c1, c2, c3, c4, c5 = st.columns(5)
-    c1.metric("Today's Sales", fmt_inr(sales_today))
-    c2.metric("Today's Purchases", fmt_inr(purchases_today))
-    c3.metric("Stock Value", fmt_inr(stock_value))
-    c4.metric("Stock Qty", f"{pieces:,.3f}")
-    c5.metric("Net Metal Weight", f"{net_weight:,.3f} g")
+    rates = india_market_rates()
+    updated_at = rates.get("updated_at")
+    updated_label = updated_at.strftime("%d %b · %I:%M %p IST") if updated_at else "Live market"
 
-    st.subheader("Recent Vouchers")
-    if vouchers:
-        df = pd.DataFrame(vouchers)
-        show_cols = [c for c in ["voucher_date", "voucher_number", "voucher_type", "reference_no", "status", "total_amount"] if c in df.columns]
-        st.dataframe(df[show_cols].head(20), use_container_width=True, hide_index=True)
-    else:
-        st.info("No vouchers posted yet. Start with Product Master / Opening Stock or create a purchase/sale voucher.")
+    def rate_value(value: Any, unit: str) -> str:
+        if value is None:
+            return "Unavailable"
+        return f"₹{float(value):,.2f}{unit}"
 
-    st.subheader("Inventory Snapshot")
-    if stock:
-        sdf = pd.DataFrame(stock)
-        cols = [c for c in ["item_code", "item_name", "metal", "purity", "location_name", "quantity", "gross_weight", "net_weight", "stock_value"] if c in sdf.columns]
-        st.dataframe(sdf[cols].head(25), use_container_width=True, hide_index=True)
-    else:
-        st.caption("Opening stock has not been entered yet.")
+    st.markdown(
+        f"""
+        <div class="market-head">
+          <div>
+            <div class="section-kicker">INDIA MARKET REFERENCE</div>
+            <div class="section-title">Today’s Jewellery Rates</div>
+          </div>
+          <div class="live-pill"><span></span> {updated_label}</div>
+        </div>
+        <div class="rate-grid">
+          <div class="rate-card gold">
+            <div class="rate-icon">Au</div>
+            <div class="rate-copy">
+              <div class="rate-label">Gold · 24K</div>
+              <div class="rate-value">{rate_value(rates.get("gold_24k"), " / g")}</div>
+              <div class="rate-note">Live bullion reference</div>
+            </div>
+          </div>
+          <div class="rate-card gold">
+            <div class="rate-icon">22</div>
+            <div class="rate-copy">
+              <div class="rate-label">Gold · 22K</div>
+              <div class="rate-value">{rate_value(rates.get("gold_22k"), " / g")}</div>
+              <div class="rate-note">Jewellery purity reference</div>
+            </div>
+          </div>
+          <div class="rate-card silver">
+            <div class="rate-icon">Ag</div>
+            <div class="rate-copy">
+              <div class="rate-label">Silver · 999</div>
+              <div class="rate-value">{rate_value(rates.get("silver_999"), " / g")}</div>
+              <div class="rate-note">Live bullion reference</div>
+            </div>
+          </div>
+          <div class="rate-card diamond">
+            <div class="rate-icon">◇</div>
+            <div class="rate-copy">
+              <div class="rate-label">Natural Diamond · 1 ct</div>
+              <div class="rate-value">{rate_value(rates.get("diamond_1ct"), " / ct")}</div>
+              <div class="rate-note">India benchmark · varies by 4Cs</div>
+            </div>
+          </div>
+        </div>
+        <div class="rate-disclaimer">
+          Market reference only. Gold/silver are converted live bullion values before GST, local premium and making charges.
+          Diamond is a 1-carat natural-diamond market benchmark, not a universal spot rate.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        f"""
+        <div class="section-kicker kpi-kicker">BUSINESS PULSE</div>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Today’s Sales</div>
+            <div class="kpi-value">{fmt_inr_compact(sales_today)}</div>
+            <div class="kpi-meta">Posted sales vouchers</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Today’s Purchases</div>
+            <div class="kpi-value">{fmt_inr_compact(purchases_today)}</div>
+            <div class="kpi-meta">Posted purchase vouchers</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Stock Value</div>
+            <div class="kpi-value">{fmt_inr_compact(stock_value)}</div>
+            <div class="kpi-meta">Movement-led inventory value</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Stock Quantity</div>
+            <div class="kpi-value">{pieces:,.3f}</div>
+            <div class="kpi-meta">Pieces / units on hand</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Net Metal Weight</div>
+            <div class="kpi-value">{net_weight:,.3f}<span> g</span></div>
+            <div class="kpi-meta">Across active stock</div>
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    left, right = st.columns([1.7, 1], gap="large")
+
+    with left:
+        st.markdown(
+            '<div class="panel-heading"><div><span>PERFORMANCE</span><strong>Monthly Sales</strong></div><em>Posted vouchers</em></div>',
+            unsafe_allow_html=True,
+        )
+        sales_rows = [
+            v for v in vouchers
+            if v.get("voucher_type") == "SALE" and v.get("status") == "POSTED"
+        ]
+        if sales_rows:
+            sales_df = pd.DataFrame(sales_rows)
+            sales_df["voucher_date"] = pd.to_datetime(sales_df["voucher_date"], errors="coerce")
+            sales_df["amount"] = pd.to_numeric(sales_df["total_amount"], errors="coerce").fillna(0)
+            sales_df = sales_df.dropna(subset=["voucher_date"])
+            if not sales_df.empty:
+                sales_df["month"] = sales_df["voucher_date"].dt.to_period("M").dt.to_timestamp()
+                monthly = sales_df.groupby("month", as_index=False)["amount"].sum().tail(12)
+                chart = (
+                    alt.Chart(monthly)
+                    .mark_area(
+                        line={"color": "#D2A33A", "strokeWidth": 2.3},
+                        color=alt.Gradient(
+                            gradient="linear",
+                            stops=[
+                                alt.GradientStop(color="#D2A33A", offset=0),
+                                alt.GradientStop(color="#F8F3E8", offset=1),
+                            ],
+                            x1=1, x2=1, y1=1, y2=0,
+                        ),
+                        opacity=0.42,
+                    )
+                    .encode(
+                        x=alt.X("month:T", title=None, axis=alt.Axis(format="%b", labelColor="#6C7C6A")),
+                        y=alt.Y("amount:Q", title=None, axis=alt.Axis(format="~s", labelColor="#6C7C6A")),
+                        tooltip=[
+                            alt.Tooltip("month:T", title="Month", format="%B %Y"),
+                            alt.Tooltip("amount:Q", title="Sales", format=",.2f"),
+                        ],
+                    )
+                    .properties(height=260)
+                )
+                st.altair_chart(chart, use_container_width=True)
+            else:
+                st.markdown('<div class="empty-panel">No posted sales yet.</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="empty-panel">No posted sales yet. Your trend will appear here.</div>', unsafe_allow_html=True)
+
+    with right:
+        st.markdown(
+            '<div class="panel-heading"><div><span>PORTFOLIO</span><strong>Inventory Mix</strong></div><em>By stock value</em></div>',
+            unsafe_allow_html=True,
+        )
+        if stock:
+            mix = pd.DataFrame(stock)
+            mix["metal"] = mix.get("metal", pd.Series(dtype=str)).fillna("Other").replace("", "Other")
+            mix["stock_value"] = pd.to_numeric(mix.get("stock_value", 0), errors="coerce").fillna(0)
+            mix = mix.groupby("metal", as_index=False)["stock_value"].sum()
+            if mix["stock_value"].sum() <= 0:
+                mix["stock_value"] = 1
+            donut = (
+                alt.Chart(mix)
+                .mark_arc(innerRadius=62, outerRadius=100, stroke="#FFFDF8", strokeWidth=2)
+                .encode(
+                    theta=alt.Theta("stock_value:Q"),
+                    color=alt.Color(
+                        "metal:N",
+                        legend=alt.Legend(orient="bottom", labelColor="#496252", title=None),
+                        scale=alt.Scale(range=["#D2A33A", "#103C2B", "#9EA7A0", "#8C5F43", "#E6C66E", "#6C7C6A"]),
+                    ),
+                    tooltip=[
+                        alt.Tooltip("metal:N", title="Metal"),
+                        alt.Tooltip("stock_value:Q", title="Value", format=",.2f"),
+                    ],
+                )
+                .properties(height=260)
+            )
+            st.altair_chart(donut, use_container_width=True)
+        else:
+            st.markdown('<div class="empty-panel">Inventory mix will appear after opening stock.</div>', unsafe_allow_html=True)
+
+    lower_left, lower_right = st.columns([1.65, 0.75], gap="large")
+    with lower_left:
+        st.markdown(
+            '<div class="panel-heading table-title"><div><span>ACTIVITY</span><strong>Recent Vouchers</strong></div><em>Latest postings</em></div>',
+            unsafe_allow_html=True,
+        )
+        if vouchers:
+            df = pd.DataFrame(vouchers)
+            show_cols = [
+                col for col in
+                ["voucher_date", "voucher_number", "voucher_type", "reference_no", "status", "total_amount"]
+                if col in df.columns
+            ]
+            recent = df[show_cols].head(12).copy()
+            recent = recent.rename(columns={
+                "voucher_date": "Date",
+                "voucher_number": "Voucher No.",
+                "voucher_type": "Type",
+                "reference_no": "Reference",
+                "status": "Status",
+                "total_amount": "Amount",
+            })
+            st.dataframe(
+                recent,
+                use_container_width=True,
+                hide_index=True,
+                height=min(420, 48 + len(recent) * 35),
+            )
+        else:
+            st.markdown('<div class="empty-panel">No vouchers posted yet.</div>', unsafe_allow_html=True)
+
+    with lower_right:
+        attention = []
+        for item in stock:
+            qty = float(item.get("quantity") or 0)
+            net = float(item.get("net_weight") or 0)
+            mode = (item.get("tracking_mode") or "").upper()
+            needs_attention = (
+                mode in ("PIECE", "QUANTITY") and 0 < qty <= 1
+            ) or (
+                mode == "WEIGHT" and 0 < net <= 10
+            )
+            if needs_attention:
+                attention.append(item)
+
+        st.markdown(
+            f"""
+            <div class="attention-card">
+              <div class="attention-top">
+                <div>
+                  <span>ATTENTION</span>
+                  <strong>Stock Watch</strong>
+                </div>
+                <div class="attention-count">{len(attention)}</div>
+              </div>
+              <p>Items at low on-hand levels based on their tracking mode.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if attention:
+            for item in attention[:5]:
+                label = f"{item.get('item_code') or ''} · {item.get('item_name') or ''}"
+                value = (
+                    f"{float(item.get('net_weight') or 0):,.3f} g"
+                    if (item.get("tracking_mode") or "").upper() == "WEIGHT"
+                    else f"{float(item.get('quantity') or 0):,.3f}"
+                )
+                st.markdown(
+                    f'<div class="attention-row"><span>{label}</span><strong>{value}</strong></div>',
+                    unsafe_allow_html=True,
+                )
+        else:
+            st.markdown('<div class="attention-row ok"><span>All clear</span><strong>✓</strong></div>', unsafe_allow_html=True)
 
 
 def masters_page(cid: str):
@@ -703,7 +960,7 @@ with st.sidebar:
         <div class="sidebar-brand">
           <div class="sidebar-monogram">SRJ</div>
           <div class="sidebar-name">{comp.get('name','Shubhraj Jewels').upper()}</div>
-          <div class="sidebar-jewels">JEWELS ERP</div>
+          <div class="sidebar-jewels">JEWELLERY ERP</div>
         </div>
         """,
         unsafe_allow_html=True,
