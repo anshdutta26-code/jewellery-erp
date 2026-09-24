@@ -441,11 +441,11 @@ def inject_css() -> None:
         }
 
         /* Keep Streamlit chrome discreet; sidebar opener remains available. */
-        [data-testid="stToolbar"] {
-          opacity: .32;
-          transition: opacity .18s ease;
+        [data-testid="stToolbar"] { display: none !important; }
+        [data-testid="stHeader"] {
+          background: transparent !important;
+          box-shadow: none !important;
         }
-        [data-testid="stToolbar"]:hover { opacity: 1; }
         #MainMenu, footer { visibility: hidden; }
 
         /* Sidebar: luxury navigation, no default radio bullets. */
@@ -888,7 +888,20 @@ def inject_css() -> None:
         }
 
         @media (max-width: 480px) {
-          .rate-grid { grid-template-columns: 1fr; }
+          .rate-grid { grid-template-columns: 1fr 1fr; }
+          .rate-card {
+            min-height: 98px;
+            padding: .66rem .58rem;
+            gap: .48rem;
+          }
+          .rate-card .rate-icon {
+            width: 34px;
+            height: 34px;
+            flex-basis: 34px;
+          }
+          .rate-label { font-size: .53rem; letter-spacing: .08em; }
+          .rate-value { font-size: .94rem; }
+          .rate-note { font-size: .46rem; line-height: 1.25; }
           .kpi-grid { grid-template-columns: 1fr 1fr; }
           .kpi-card:last-child { grid-column: span 2; }
           .section-title { font-size: 1.48rem; }
