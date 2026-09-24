@@ -27,8 +27,34 @@ def inject_css() -> None:
           --srj-border: rgba(210, 163, 58, .34);
         }
 
-        html, body, [class*="st-"] {
+        html, body, .stApp {
           font-family: "Montserrat", sans-serif;
+        }
+
+        .stApp input,
+        .stApp textarea,
+        .stApp select,
+        .stApp button,
+        .stApp label,
+        .stApp p,
+        .stApp div {
+          font-family: "Montserrat", sans-serif;
+        }
+
+        .stApp .erp-title,
+        .stApp .headline,
+        .stApp h1,
+        .stApp h2,
+        .stApp h3,
+        .stApp .kpi-value,
+        .stApp .rate-value,
+        .stApp .section-title,
+        .stApp .panel-heading strong,
+        .stApp .sidebar-monogram,
+        .stApp .sidebar-name,
+        .stApp .srj-monogram,
+        .stApp .srj-name {
+          font-family: "Cormorant Garamond", Georgia, serif !important;
         }
 
         .stApp {
@@ -423,6 +449,262 @@ def inject_css() -> None:
         }
 
         .muted { color: var(--srj-sage); }
+
+        /* Password visibility: keep a true eye control, never raw icon text. */
+        [data-testid="stTextInput"] button {
+          min-width: 42px !important;
+          width: 42px !important;
+          height: 42px !important;
+          padding: 0 !important;
+          border: 0 !important;
+          background: transparent !important;
+          box-shadow: none !important;
+          color: transparent !important;
+          position: relative !important;
+        }
+
+        [data-testid="stTextInput"] button span,
+        [data-testid="stTextInput"] button div {
+          font-size: 0 !important;
+          color: transparent !important;
+        }
+
+        [data-testid="stTextInput"] button::after {
+          content: "👁";
+          position: absolute;
+          inset: 0;
+          display: grid;
+          place-items: center;
+          color: #103C2B;
+          font-size: 17px;
+          line-height: 1;
+        }
+
+        /* Approved responsive dashboard */
+        .dashboard-shell {
+          width: 100%;
+          padding-bottom: .5rem;
+        }
+
+        .dashboard-grid {
+          display: grid;
+          gap: 14px;
+          margin-top: 14px;
+        }
+
+        .dashboard-grid-top {
+          grid-template-columns: minmax(0, 1.65fr) minmax(280px, .85fr);
+        }
+
+        .dashboard-grid-bottom {
+          grid-template-columns: minmax(0, 1.7fr) minmax(280px, .7fr);
+          align-items: start;
+        }
+
+        .dashboard-panel {
+          min-width: 0;
+          border: 1px solid rgba(210,163,58,.28);
+          border-radius: 12px;
+          background: rgba(255,253,248,.94);
+          padding: .95rem 1rem 1rem;
+          box-shadow: 0 10px 28px rgba(10,46,34,.045);
+        }
+
+        .chart-shell {
+          width: 100%;
+          min-height: 245px;
+          overflow: hidden;
+          border-radius: 9px;
+          background:
+            linear-gradient(180deg, rgba(255,253,248,.96), rgba(248,243,232,.72));
+          border: 1px solid rgba(210,163,58,.14);
+        }
+
+        .sales-svg {
+          width: 100%;
+          height: 245px;
+          display: block;
+        }
+
+        .svg-grid {
+          stroke: rgba(16,60,43,.09);
+          stroke-width: 1;
+          stroke-dasharray: 4 6;
+        }
+
+        .svg-line {
+          fill: none;
+          stroke: #D2A33A;
+          stroke-width: 3;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+
+        .svg-dot {
+          fill: #103C2B;
+          stroke: #E6C66E;
+          stroke-width: 2;
+        }
+
+        .svg-axis {
+          fill: #748278;
+          font-size: 11px;
+          font-family: "Montserrat", sans-serif;
+        }
+
+        .mix-wrap {
+          min-height: 245px;
+          display: grid;
+          grid-template-columns: 160px minmax(0, 1fr);
+          align-items: center;
+          gap: 1rem;
+          padding: .5rem;
+        }
+
+        .mix-donut {
+          width: 154px;
+          height: 154px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          box-shadow: 0 8px 24px rgba(10,46,34,.06);
+        }
+
+        .mix-hole {
+          width: 88px;
+          height: 88px;
+          border-radius: 50%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: #FFFDF8;
+          box-shadow: inset 0 0 0 1px rgba(210,163,58,.18);
+        }
+
+        .mix-hole span {
+          color: #A67E29;
+          font-size: .52rem;
+          letter-spacing: .16em;
+          font-weight: 700;
+        }
+
+        .mix-hole strong {
+          margin-top: .12rem;
+          font-family: "Cormorant Garamond", Georgia, serif !important;
+          color: #0A2E22;
+          font-size: 1.8rem;
+          line-height: .9;
+        }
+
+        .mix-hole em {
+          color: #7C887F;
+          font-size: .48rem;
+          font-style: normal;
+          margin-top: .18rem;
+        }
+
+        .mix-legend {
+          display: flex;
+          flex-direction: column;
+          gap: .48rem;
+          min-width: 0;
+        }
+
+        .mix-legend-row {
+          display: grid;
+          grid-template-columns: 9px minmax(0, 1fr) auto;
+          align-items: center;
+          gap: .5rem;
+          color: #53675A;
+          font-size: .66rem;
+        }
+
+        .mix-swatch {
+          width: 9px;
+          height: 9px;
+          border-radius: 50%;
+        }
+
+        .mix-legend-row strong {
+          color: #0A2E22;
+          font-size: .63rem;
+        }
+
+        .lux-table-wrap {
+          overflow-x: auto;
+          border: 1px solid rgba(210,163,58,.16);
+          border-radius: 9px;
+        }
+
+        .lux-table {
+          width: 100%;
+          border-collapse: collapse;
+          min-width: 680px;
+          background: rgba(255,253,248,.78);
+        }
+
+        .lux-table th {
+          text-align: left;
+          padding: .66rem .72rem;
+          background: rgba(16,60,43,.045);
+          color: #708076;
+          font-size: .52rem;
+          letter-spacing: .11em;
+          text-transform: uppercase;
+          font-weight: 700;
+          border-bottom: 1px solid rgba(210,163,58,.17);
+        }
+
+        .lux-table td {
+          padding: .7rem .72rem;
+          color: #42594A;
+          font-size: .64rem;
+          border-bottom: 1px solid rgba(16,60,43,.06);
+          vertical-align: middle;
+        }
+
+        .lux-table tr:last-child td { border-bottom: 0; }
+
+        .amount-cell {
+          color: #0A2E22 !important;
+          font-weight: 700;
+          white-space: nowrap;
+        }
+
+        .voucher-chip,
+        .status-chip {
+          display: inline-flex;
+          align-items: center;
+          padding: .24rem .42rem;
+          border-radius: 999px;
+          font-size: .51rem;
+          font-weight: 700;
+          letter-spacing: .06em;
+          white-space: nowrap;
+        }
+
+        .voucher-chip {
+          color: #85651F;
+          background: rgba(210,163,58,.11);
+          border: 1px solid rgba(210,163,58,.20);
+        }
+
+        .status-chip {
+          color: #246845;
+          background: rgba(45,140,91,.09);
+          border: 1px solid rgba(45,140,91,.17);
+        }
+
+        .empty-cell {
+          text-align: center;
+          color: #839087 !important;
+          padding: 1.4rem !important;
+        }
+
+        .compact-empty {
+          min-height: 245px;
+        }
 
         /* Restore Streamlit's Material icons after global font branding. */
         [data-testid="stIconMaterial"],
@@ -824,6 +1106,10 @@ def inject_css() -> None:
         @media (max-width: 1180px) {
           .rate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+          .dashboard-grid-top,
+          .dashboard-grid-bottom {
+            grid-template-columns: minmax(0, 1.3fr) minmax(260px, .8fr);
+          }
         }
 
         @media (max-width: 900px) {
@@ -834,6 +1120,13 @@ def inject_css() -> None:
           .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
           .kpi-card { min-height: 116px; }
           .kpi-value { font-size: 1.75rem; }
+          .dashboard-grid-top,
+          .dashboard-grid-bottom {
+            grid-template-columns: 1fr;
+          }
+          .mix-wrap {
+            grid-template-columns: 180px minmax(0, 1fr);
+          }
         }
 
         @media (max-width: 800px) {
@@ -884,7 +1177,30 @@ def inject_css() -> None:
           .kpi-meta { font-size: .52rem; }
           .panel-heading strong { font-size: 1.25rem; }
           .panel-heading em { display: none; }
+          .dashboard-panel { padding: .78rem; }
+          .chart-shell,
+          .sales-svg,
+          .compact-empty { min-height: 205px; height: 205px; }
+          .mix-wrap {
+            min-height: 205px;
+            grid-template-columns: 132px minmax(0, 1fr);
+            gap: .7rem;
+            padding: .3rem;
+          }
+          .mix-donut { width: 126px; height: 126px; }
+          .mix-hole { width: 72px; height: 72px; }
+          .mix-hole strong { font-size: 1.45rem; }
           div[data-testid="stMetric"] { min-height: 96px; }
+        }
+
+        @media (max-width: 620px) {
+          .mix-wrap {
+            grid-template-columns: 1fr;
+            justify-items: center;
+          }
+          .mix-legend { width: 100%; }
+          .dashboard-panel { border-radius: 10px; }
+          .lux-table { min-width: 620px; }
         }
 
         @media (max-width: 480px) {
