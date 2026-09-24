@@ -403,15 +403,19 @@ def dashboard(cid: str):
             attention.append(item)
 
     if attention:
-        attention_rows = "".join(
-            (
+        attention_parts = []
+        for item in attention[:5]:
+            if (item.get("tracking_mode") or "").upper() == "WEIGHT":
+                attention_value = f"{float(item.get('net_weight') or 0):,.3f} g"
+            else:
+                attention_value = f"{float(item.get('quantity') or 0):,.3f}"
+            attention_parts.append(
                 "<div class='attention-row'>"
                 f"<span>{escape(str(item.get('item_code') or ''))} · {escape(str(item.get('item_name') or ''))}</span>"
-                f"<strong>{(f'{float(item.get('net_weight') or 0):,.3f} g' if (item.get('tracking_mode') or '').upper() == 'WEIGHT' else f'{float(item.get('quantity') or 0):,.3f}')}</strong>"
+                f"<strong>{attention_value}</strong>"
                 "</div>"
             )
-            for item in attention[:5]
-        )
+        attention_rows = "".join(attention_parts)
     else:
         attention_rows = "<div class='attention-row ok'><span>All monitored stock levels are clear</span><strong>✓</strong></div>"
 
