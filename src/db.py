@@ -25,9 +25,15 @@ def _secret(name: str) -> str:
     return str(value)
 
 
+DEFAULT_SUPABASE_URL = "https://uqqokyjckmezqhhxnmri.supabase.co"
+DEFAULT_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVxcW9reWpja21lenFoaHhubXJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyNTI5MDMsImV4cCI6MjEwNTgyODkwM30.GytunIVaZo9wOh2ECfhZ4vx2YPvRIgjLA_SKfARQCGU"
+
+
 @st.cache_resource(show_spinner=False)
 def auth_client() -> Client:
-    return create_client(_secret("SUPABASE_URL"), _secret("SUPABASE_ANON_KEY"))
+    # The anon key is public by design. Keeping the verified project key here
+    # avoids deployment failures caused by an incorrectly copied public key.
+    return create_client(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_ANON_KEY)
 
 
 @st.cache_resource(show_spinner=False)
@@ -41,15 +47,18 @@ def sign_in(email: str, password: str) -> SessionUser:
     if not res.user:
         raise RuntimeError("Login failed")
     user_id = str(res.user.id)
-    profile = (
-        db_client()
-        .table("profiles")
-        .select("user_id,company_id,full_name,role,active")
-        .eq("user_id", user_id)
-        .single()
-        .execute()
-        .data
-    )
+    try:
+        profile = (
+            auth
+            .table("profiles")
+            .select("user_id,company_id,full_name,role,active")
+            .eq("user_id", user_id)
+            .single()
+            .execute()
+            .data
+        )
+    except Exception as exc:
+        raise RuntimeError(f"Signed in, but profile access failed: {exc}") from exc
     if profile and not profile.get("active", True):
         raise RuntimeError("This user is inactive")
     return SessionUser(
@@ -98,7 +107,8 @@ def by_id(table: str, row_id: str, columns: str = "*") -> dict[str, Any] | None:
 
 
 def get_profile(user_id: str) -> dict[str, Any] | None:
-    return db_client().table("profiles").select("*").eq("user_id", user_id).single().execute().data
+    # Read the signed-in user's own profile through RLS rather than the service key.
+    return auth_client().table("profiles").select("*").eq("user_id", user_id).single().execute().data
 
 
 def company(company_id: str) -> dict[str, Any] | None:
@@ -106,11 +116,22 @@ def company(company_id: str) -> dict[str, Any] | None:
 
 
 def create_company_for_user(user_id: str, company_payload: dict[str, Any]) -> str:
-    created = db_client().table("companies").insert(company_payload).execute().data
+    try:
+        admin_db = db_client()
+        # Force a lightweight request so an invalid server key produces a clear error.
+        admin_db.table("profiles").select("user_id").eq("user_id", user_id).limit(1).execute()
+    except Exception as exc:
+        raise RuntimeError(
+            "The Streamlit SUPABASE_SERVICE_ROLE_KEY is missing or invalid. "
+            "Open Streamlit Manage app → Settings → Secrets and replace it with the "
+            "Supabase Jewellery ERP service_role/secret key."
+        ) from exc
+
+    created = admin_db.table("companies").insert(company_payload).execute().data
     if not created:
         raise RuntimeError("Company could not be created")
     company_id = created[0]["id"]
-    db_client().table("profiles").update({"company_id": company_id, "role": "OWNER"}).eq("user_id", user_id).execute()
+    admin_db.table("profiles").update({"company_id": company_id, "role": "OWNER"}).eq("user_id", user_id).execute()
     rpc("seed_company_defaults", {"p_company_id": company_id})
     return company_id
 
