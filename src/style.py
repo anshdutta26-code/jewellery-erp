@@ -2265,6 +2265,85 @@ def inject_css() -> None:
           }
         }
 
+
+        .erp-footer {
+          margin-top: .6rem;
+          padding: .48rem .15rem .18rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          border-top: 1px solid rgba(139,102,55,.14);
+          color: #8D8176;
+          font-size: .44rem;
+          letter-spacing: .03em;
+        }
+
+        .erp-footer > div {
+          display: flex;
+          align-items: center;
+          gap: .45rem;
+        }
+
+        .erp-footer strong {
+          color: #5B4939;
+          font-size: .46rem;
+          letter-spacing: .08em;
+        }
+
+        .erp-footer span {
+          padding-left: .45rem;
+          border-left: 1px solid rgba(120,91,55,.18);
+        }
+
+        .erp-footer b {
+          color: #B48A3A;
+          font-weight: 400;
+        }
+
+        @media (max-width: 900px) {
+          [data-testid="stHeader"] button[kind="headerNoPadding"] {
+            position: fixed !important;
+            top: 12px !important;
+            right: 14px !important;
+            left: auto !important;
+            z-index: 1000002 !important;
+            width: 44px !important;
+            height: 44px !important;
+            border: 0 !important;
+            border-radius: 7px !important;
+            background: #123C2C !important;
+            color: transparent !important;
+            box-shadow: 0 5px 15px rgba(10,46,34,.13) !important;
+          }
+
+          [data-testid="stHeader"] button[kind="headerNoPadding"] svg,
+          [data-testid="stHeader"] button[kind="headerNoPadding"] span {
+            display: none !important;
+          }
+
+          [data-testid="stHeader"] button[kind="headerNoPadding"]::before {
+            content: "";
+            position: absolute;
+            width: 21px;
+            height: 14px;
+            left: 11px;
+            top: 14px;
+            background:
+              linear-gradient(#E8CC7A,#E8CC7A) 0 0/21px 2px no-repeat,
+              linear-gradient(#E8CC7A,#E8CC7A) 0 6px/21px 2px no-repeat,
+              linear-gradient(#E8CC7A,#E8CC7A) 0 12px/21px 2px no-repeat;
+          }
+
+          .erp-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: .28rem;
+            font-size: .42rem;
+            padding-bottom: .8rem;
+          }
+        }
+
         </style>
         """,
         unsafe_allow_html=True,
