@@ -559,3 +559,56 @@ create index if not exists idx_voucher_items_location on public.voucher_items(lo
 create index if not exists idx_voucher_items_product on public.voucher_items(product_id);
 create index if not exists idx_vouchers_created_by on public.vouchers(created_by);
 create index if not exists idx_vouchers_party_ledger on public.vouchers(party_ledger_id);
+
+
+-- ---------- username login ----------
+alter table public.profiles add column if not exists username text;
+
+update public.profiles p
+set username = lower(regexp_replace(split_part(u.email, '@', 1), '[^a-z0-9_]+', '', 'g'))
+from auth.users u
+where p.user_id = u.id
+  and (p.username is null or btrim(p.username) = '');
+
+create unique index if not exists profiles_username_lower_uidx
+on public.profiles (lower(username))
+where username is not null;
+
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into public.profiles(user_id, full_name, username, role)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'full_name', new.email),
+    nullif(lower(regexp_replace(coalesce(new.raw_user_meta_data->>'username',''), '[^a-z0-9_]+', '', 'g')), ''),
+    'ADMIN'
+  )
+  on conflict (user_id) do update
+  set
+    full_name = excluded.full_name,
+    username = coalesce(public.profiles.username, excluded.username);
+  return new;
+end;
+$$;
+
+create or replace function public.resolve_login_email(p_username text)
+returns text
+language sql
+security definer
+set search_path = public, auth
+stable
+as $$
+  select u.email
+  from public.profiles p
+  join auth.users u on u.id = p.user_id
+  where lower(p.username) = lower(btrim(p_username))
+    and p.active = true
+  limit 1;
+$$;
+
+revoke execute on function public.resolve_login_email(text) from public;
+grant execute on function public.resolve_login_email(text) to anon, authenticated;
