@@ -27,7 +27,7 @@ from src.db import (
 )
 from src.style import inject_css, page_header
 
-st.set_page_config(page_title="Jewellery ERP", page_icon="💎", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Shubhraj Jewels ERP", page_icon="💎", layout="wide", initial_sidebar_state="expanded")
 inject_css()
 
 
@@ -50,7 +50,7 @@ def require_user():
     if "user" in st.session_state:
         return st.session_state.user
 
-    page_header("Jewellery ERP", "Tally-style accounting + jewellery inventory, powered by Streamlit and Supabase")
+    page_header("Shubhraj Jewels ERP", "Accounts, inventory and jewellery operations")
     tab1, tab2 = st.tabs(["Sign in", "Create first account"])
     with tab1:
         with st.form("login"):
@@ -674,9 +674,9 @@ def admin_page(cid: str, user):
 
 
 user=require_user(); setup_company_if_needed(user); cid=user.company_id
-comp=company(cid) or {"name":"Jewellery ERP"}
+comp=company(cid) or {"name":"Shubhraj Jewels"}
 with st.sidebar:
-    st.markdown(f"### 💎 {comp.get('name','Jewellery ERP')}")
+    st.markdown(f"### 💎 {comp.get('name','Shubhraj Jewels')}")
     st.caption(f"{user.full_name or user.email} · {user.role}")
     nav=st.radio("Menu",["Dashboard","Masters","Opening Stock","Sales Voucher","Purchase Voucher","Accounting Vouchers","Stock Transfer","Inventory","Reports","Admin"],label_visibility="collapsed")
     st.divider()
