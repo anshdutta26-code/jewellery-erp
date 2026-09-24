@@ -5,6 +5,7 @@ from datetime import date, datetime
 from io import BytesIO
 from html import escape
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import streamlit as st
@@ -227,10 +228,19 @@ def find_ledger(ledgers: list[dict], exact_name: str) -> str | None:
 
 
 def dashboard(cid: str):
-    page_header("Dashboard", "A premium command centre for sales, stock, accounts and market intelligence")
     vouchers = voucher_list(cid, 1000)
     stock = stock_summary(cid)
+    ledgers = rows("ledgers", cid, order="name")
+    ledger_names = {str(x.get("id")): str(x.get("name") or "—") for x in ledgers}
     today = date.today().isoformat()
+
+    current_user = st.session_state.get("user")
+    comp = company(cid) or {"name": "Shubhraj Jewels"}
+    now_india = datetime.now(ZoneInfo("Asia/Kolkata"))
+    hour = now_india.hour
+    greeting = "Good Morning" if hour < 12 else ("Good Afternoon" if hour < 17 else "Good Evening")
+    display_name = (getattr(current_user, "full_name", None) or getattr(current_user, "username", None) or "Admin")
+    initials = "".join(part[0] for part in display_name.split()[:2]).upper() or "SJ"
 
     sales_today = sum(
         float(v.get("total_amount") or 0)
@@ -253,15 +263,89 @@ def dashboard(cid: str):
     rates = india_market_rates()
     updated_at = rates.get("updated_at")
     updated_label = updated_at.strftime("%d %b · %I:%M %p IST") if updated_at else "Live market"
-    metal_source = escape(str(rates.get("metal_source") or "Market reference"))
+    metal_source = escape(str(rates.get("metal_source") or "India market reference"))
     diamond_source = escape(str(rates.get("diamond_source") or "India diamond benchmark"))
 
-    def rate_value(value: Any, unit: str) -> str:
+    gold_24_10g = float(rates.get("gold_24k") or 0) * 10 if rates.get("gold_24k") is not None else None
+    gold_22_10g = float(rates.get("gold_22k") or 0) * 10 if rates.get("gold_22k") is not None else None
+    silver_1kg = float(rates.get("silver_999") or 0) * 1000 if rates.get("silver_999") is not None else None
+    diamond_1ct = rates.get("diamond_1ct")
+
+    def money_rate(value: Any) -> str:
         if value is None:
             return "Unavailable"
-        return f"₹{float(value):,.2f}{unit}"
+        return f"₹{float(value):,.0f}"
 
-    # Build monthly sales SVG without Altair/JS dependencies.
+    st.markdown(
+        f"""
+        <section class="executive-topbar">
+          <div class="greeting-block">
+            <div class="greeting-title">{greeting}</div>
+            <div class="greeting-sub">Shubhraj Jewels ERP</div>
+          </div>
+          <div class="topbar-motto">
+            <span class="motto-mark">◇</span>
+            <div><strong>PRECIOUS INVENTORY</strong><em>PROSPEROUS TOMORROW</em></div>
+          </div>
+          <div class="topbar-actions">
+            <div class="dashboard-search"><span>⌕</span> Search Voucher No., Party, Item...</div>
+            <div class="profile-orb">{escape(initials)}</div>
+            <div class="profile-copy"><strong>{escape(display_name)}</strong><span>{escape(str(comp.get("name") or "Shubhraj Jewels"))}</span></div>
+          </div>
+        </section>
+
+        <section class="brand-banner">
+          <div class="banner-copy left"><span>EXQUISITE PIECES</span><strong>EXCEPTIONAL JOURNEYS</strong></div>
+          <div class="banner-center"><span class="banner-mark">◇</span><strong>SHUBHRAJ JEWELS</strong><em>A LEGACY IN EVERY SPARKLE</em></div>
+          <div class="banner-arch"><div class="jewel-display">◇</div></div>
+          <div class="banner-copy right"><span>CRAFTING</span><strong>A BRIGHTER TOMORROW</strong></div>
+        </section>
+
+        <section class="rate-matrix">
+          <article class="market-cell gold-cell">
+            <div class="market-symbol">Au</div>
+            <div class="market-copy">
+              <span>GOLD · INDIA</span>
+              <strong>{money_rate(gold_24_10g)} <small>/ 10g</small></strong>
+              <em>24K · 22K {money_rate(gold_22_10g)} / 10g</em>
+            </div>
+          </article>
+          <article class="market-cell diamond-cell">
+            <div class="market-symbol">◇</div>
+            <div class="market-copy">
+              <span>NATURAL DIAMOND</span>
+              <strong>{money_rate(diamond_1ct)} <small>/ 1ct</small></strong>
+              <em>India benchmark · varies by 4Cs</em>
+            </div>
+          </article>
+          <article class="market-cell silver-cell">
+            <div class="market-symbol">Ag</div>
+            <div class="market-copy">
+              <span>SILVER · 999</span>
+              <strong>{money_rate(silver_1kg)} <small>/ 1kg</small></strong>
+              <em>India market reference</em>
+            </div>
+          </article>
+          <div class="market-updated"><span></span>{updated_label}</div>
+        </section>
+        <div class="market-footnote">Rates are market references before GST, local premium and making charges. Gold source: {metal_source}. Diamond source: {diamond_source}.</div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        f"""
+        <section class="executive-kpis">
+          <article class="executive-kpi"><div class="kpi-glyph">₹</div><div><span>TODAY'S SALES</span><strong>{fmt_inr_compact(sales_today)}</strong><em>Posted vouchers</em></div><div class="kpi-art necklace-art">◇</div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">▣</div><div><span>TODAY'S PURCHASES</span><strong>{fmt_inr_compact(purchases_today)}</strong><em>Purchase register</em></div><div class="kpi-art ring-art">◈</div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">◫</div><div><span>STOCK VALUE</span><strong>{fmt_inr_compact(stock_value)}</strong><em>As on {now_india.strftime("%d %b %Y")}</em></div><div class="kpi-art bars-art">▰</div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">◇</div><div><span>STOCK QTY</span><strong>{pieces:,.0f}<small> pcs</small></strong><em>Across all categories</em></div><div class="kpi-art bangle-art">○</div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">⚖</div><div><span>NET METAL WEIGHT</span><strong>{net_weight:,.3f}<small> g</small></strong><em>Purity-wise consolidated</em></div></article>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
     sales_rows = [
         v for v in vouchers
         if v.get("voucher_type") == "SALE" and v.get("status") == "POSTED"
@@ -281,44 +365,31 @@ def dashboard(cid: str):
             ]
 
     if monthly_points:
-        width, height = 720, 245
-        left_pad, right_pad, top_pad, bottom_pad = 30, 18, 20, 34
+        width, height = 760, 260
+        left_pad, right_pad, top_pad, bottom_pad = 34, 18, 20, 38
         max_value = max(value for _, value in monthly_points) or 1.0
         usable_w = width - left_pad - right_pad
         usable_h = height - top_pad - bottom_pad
         count = len(monthly_points)
         points = []
         labels = []
+        bars = []
         for i, (label, value) in enumerate(monthly_points):
             x = left_pad + (usable_w * i / max(count - 1, 1))
             y = top_pad + usable_h * (1 - value / max_value)
             points.append((x, y))
-            labels.append(
-                f'<text x="{x:.1f}" y="{height - 10}" text-anchor="middle" class="svg-axis">{label}</text>'
-            )
+            labels.append(f'<text x="{x:.1f}" y="{height - 12}" text-anchor="middle" class="svg-axis">{label}</text>')
+            bar_w = min(30, usable_w / max(count, 1) * .5)
+            bars.append(f'<rect x="{x - bar_w/2:.1f}" y="{y:.1f}" width="{bar_w:.1f}" height="{height-bottom_pad-y:.1f}" rx="3" class="svg-bar"/>')
         polyline = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
-        area_path = (
-            f"M {points[0][0]:.1f} {height-bottom_pad:.1f} "
-            + " ".join(f"L {x:.1f} {y:.1f}" for x, y in points)
-            + f" L {points[-1][0]:.1f} {height-bottom_pad:.1f} Z"
-        )
-        dots = "".join(
-            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.5" class="svg-dot"/>'
-            for x, y in points
-        )
+        dots = "".join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3.8" class="svg-dot"/>' for x, y in points)
         chart_html = f"""
         <div class="chart-shell">
-          <svg class="sales-svg" viewBox="0 0 {width} {height}" preserveAspectRatio="none" aria-label="Monthly sales chart">
-            <defs>
-              <linearGradient id="salesFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#D2A33A" stop-opacity=".34"/>
-                <stop offset="100%" stop-color="#D2A33A" stop-opacity=".02"/>
-              </linearGradient>
-            </defs>
+          <svg class="sales-svg" viewBox="0 0 {width} {height}" preserveAspectRatio="none" aria-label="Monthly sales">
             <line x1="{left_pad}" y1="{top_pad + usable_h*.25:.1f}" x2="{width-right_pad}" y2="{top_pad + usable_h*.25:.1f}" class="svg-grid"/>
             <line x1="{left_pad}" y1="{top_pad + usable_h*.50:.1f}" x2="{width-right_pad}" y2="{top_pad + usable_h*.50:.1f}" class="svg-grid"/>
             <line x1="{left_pad}" y1="{top_pad + usable_h*.75:.1f}" x2="{width-right_pad}" y2="{top_pad + usable_h*.75:.1f}" class="svg-grid"/>
-            <path d="{area_path}" fill="url(#salesFill)"/>
+            {''.join(bars)}
             <polyline points="{polyline}" class="svg-line"/>
             {dots}
             {''.join(labels)}
@@ -326,9 +397,8 @@ def dashboard(cid: str):
         </div>
         """
     else:
-        chart_html = '<div class="empty-panel compact-empty">Your monthly sales trend will appear here after the first posted sale.</div>'
+        chart_html = '<div class="empty-panel compact-empty">Monthly sales will appear after the first posted sale.</div>'
 
-    # Build an inventory-value donut with CSS conic-gradient.
     mix_values: dict[str, float] = {}
     for item in stock:
         metal = str(item.get("metal") or "Other").strip() or "Other"
@@ -337,7 +407,7 @@ def dashboard(cid: str):
             value = abs(float(item.get("quantity") or 0))
         mix_values[metal] = mix_values.get(metal, 0.0) + value
 
-    palette = ["#D2A33A", "#103C2B", "#A4AAA5", "#8C5F43", "#E6C66E", "#6C7C6A"]
+    palette = ["#C69B3C", "#787C7A", "#C9C8C2", "#0F3B2B", "#9B6D4F", "#E0BE68"]
     mix_total = sum(mix_values.values())
     if mix_total > 0:
         start_pct = 0.0
@@ -357,7 +427,7 @@ def dashboard(cid: str):
         donut_html = f"""
         <div class="mix-wrap">
           <div class="mix-donut" style="background:conic-gradient({donut_background})">
-            <div class="mix-hole"><span>STOCK</span><strong>{len(stock)}</strong><em>lines</em></div>
+            <div class="mix-hole"><span>TOTAL VALUE</span><strong>{fmt_inr_compact(stock_value)}</strong></div>
           </div>
           <div class="mix-legend">{''.join(legend_items[:6])}</div>
         </div>
@@ -365,124 +435,89 @@ def dashboard(cid: str):
     else:
         donut_html = '<div class="empty-panel compact-empty">Inventory mix will appear after opening stock.</div>'
 
-    recent_rows = []
-    for v in vouchers[:10]:
-        amount = fmt_inr_compact(v.get("total_amount") or 0)
-        recent_rows.append(
-            "<tr>"
-            f"<td>{escape(str(v.get('voucher_date') or '—'))}</td>"
-            f"<td>{escape(str(v.get('voucher_number') or '—'))}</td>"
-            f"<td><span class='voucher-chip'>{escape(str(v.get('voucher_type') or '—'))}</span></td>"
-            f"<td>{escape(str(v.get('reference_no') or '—'))}</td>"
-            f"<td class='amount-cell'>{amount}</td>"
-            f"<td><span class='status-chip'>{escape(str(v.get('status') or '—'))}</span></td>"
-            "</tr>"
-        )
-    recent_table = (
-        "<div class='lux-table-wrap'><table class='lux-table'><thead><tr>"
-        "<th>Date</th><th>Voucher</th><th>Type</th><th>Reference</th><th>Amount</th><th>Status</th>"
-        "</tr></thead><tbody>"
-        + ("".join(recent_rows) if recent_rows else "<tr><td colspan='6' class='empty-cell'>No vouchers posted yet.</td></tr>")
-        + "</tbody></table></div>"
-    )
-
     attention = []
     for item in stock:
         qty = float(item.get("quantity") or 0)
         net = float(item.get("net_weight") or 0)
         mode = (item.get("tracking_mode") or "").upper()
-        needs_attention = (
-            mode in ("PIECE", "QUANTITY") and 0 < qty <= 1
-        ) or (
-            mode == "WEIGHT" and 0 < net <= 10
-        )
-        if needs_attention:
+        if (mode in ("PIECE", "QUANTITY") and 0 < qty <= 3) or (mode == "WEIGHT" and 0 < net <= 10):
             attention.append(item)
 
     if attention:
-        attention_parts = []
-        for item in attention[:5]:
+        attention_rows = []
+        for item in attention[:6]:
             if (item.get("tracking_mode") or "").upper() == "WEIGHT":
                 attention_value = f"{float(item.get('net_weight') or 0):,.3f} g"
             else:
-                attention_value = f"{float(item.get('quantity') or 0):,.3f}"
-            attention_parts.append(
-                "<div class='attention-row'>"
-                f"<span>{escape(str(item.get('item_code') or ''))} · {escape(str(item.get('item_name') or ''))}</span>"
-                f"<strong>{attention_value}</strong>"
+                attention_value = f"{float(item.get('quantity') or 0):,.0f} pcs"
+            attention_rows.append(
+                "<div class='stock-watch-row'>"
+                "<span class='watch-jewel'>◇</span>"
+                f"<div><strong>{escape(str(item.get('item_name') or item.get('item_code') or 'Item'))}</strong>"
+                f"<em>SKU: {escape(str(item.get('item_code') or '—'))}</em></div>"
+                f"<div class='watch-count'>{attention_value}<small>Low Stock</small></div>"
                 "</div>"
             )
-        attention_rows = "".join(attention_parts)
+        stock_watch_html = "".join(attention_rows)
     else:
-        attention_rows = "<div class='attention-row ok'><span>All monitored stock levels are clear</span><strong>✓</strong></div>"
+        stock_watch_html = "<div class='stock-watch-empty'>All monitored stock levels are healthy.</div>"
 
-    dashboard_html = f"""
-    <section class="dashboard-shell">
-      <div class="market-head">
-        <div>
-          <div class="section-kicker">INDIA MARKET REFERENCE</div>
-          <div class="section-title">Today’s Jewellery Rates</div>
-        </div>
-        <div class="live-pill"><span></span>{updated_label}</div>
-      </div>
+    recent_rows = []
+    for v in vouchers[:8]:
+        amount = fmt_inr_compact(v.get("total_amount") or 0)
+        party = ledger_names.get(str(v.get("party_ledger_id")), "Walk-in / General")
+        recent_rows.append(
+            "<tr>"
+            f"<td>{escape(str(v.get('voucher_date') or '—'))}</td>"
+            f"<td>{escape(str(v.get('voucher_number') or '—'))}</td>"
+            f"<td>{escape(str(v.get('voucher_type') or '—').title())}</td>"
+            f"<td>{escape(party)}</td>"
+            f"<td class='amount-cell'>{amount}</td>"
+            f"<td><span class='status-chip'>{escape(str(v.get('status') or '—').title())}</span></td>"
+            "</tr>"
+        )
+    recent_table = (
+        "<div class='lux-table-wrap'><table class='lux-table'><thead><tr>"
+        "<th>Date</th><th>Voucher No.</th><th>Type</th><th>Party</th><th>Amount</th><th>Status</th>"
+        "</tr></thead><tbody>"
+        + ("".join(recent_rows) if recent_rows else "<tr><td colspan='6' class='empty-cell'>No vouchers posted yet.</td></tr>")
+        + "</tbody></table></div>"
+    )
 
-      <div class="rate-grid">
-        <article class="rate-card gold">
-          <div class="rate-icon">Au</div>
-          <div><div class="rate-label">Gold · 24K</div><div class="rate-value">{rate_value(rates.get("gold_24k"), " / g")}</div><div class="rate-note">{metal_source}</div></div>
-        </article>
-        <article class="rate-card gold">
-          <div class="rate-icon">22</div>
-          <div><div class="rate-label">Gold · 22K</div><div class="rate-value">{rate_value(rates.get("gold_22k"), " / g")}</div><div class="rate-note">{metal_source}</div></div>
-        </article>
-        <article class="rate-card silver">
-          <div class="rate-icon">Ag</div>
-          <div><div class="rate-label">Silver · 999</div><div class="rate-value">{rate_value(rates.get("silver_999"), " / g")}</div><div class="rate-note">{metal_source}</div></div>
-        </article>
-        <article class="rate-card diamond">
-          <div class="rate-icon">◇</div>
-          <div><div class="rate-label">Natural Diamond · 1 ct</div><div class="rate-value">{rate_value(rates.get("diamond_1ct"), " / ct")}</div><div class="rate-note">{diamond_source} · varies by 4Cs</div></div>
-        </article>
-      </div>
-      <div class="rate-disclaimer">Market reference only. Gold/silver use India daily jewellery references when available and a live bullion/INR fallback otherwise; GST, local premium and making charges are excluded. Diamond is a 1-carat natural-diamond benchmark, not a universal spot rate.</div>
+    st.markdown(
+        f"""
+        <section class="analytics-three">
+          <article class="dashboard-panel sales-panel">
+            <div class="panel-heading"><div><span>PERFORMANCE</span><strong>Monthly Sales</strong></div><em>Monthly</em></div>
+            {chart_html}
+          </article>
+          <article class="dashboard-panel mix-panel">
+            <div class="panel-heading"><div><span>PORTFOLIO</span><strong>Inventory Mix</strong></div><em>Value Wise</em></div>
+            {donut_html}
+          </article>
+          <article class="dashboard-panel stock-watch-panel">
+            <div class="panel-heading"><div><span>ATTENTION</span><strong>Low Stock / Attention</strong></div><em>View All</em></div>
+            <div class="stock-watch-list">{stock_watch_html}</div>
+          </article>
+        </section>
 
-      <div class="section-kicker kpi-kicker">BUSINESS PULSE</div>
-      <div class="kpi-grid">
-        <article class="kpi-card"><div class="kpi-label">Today’s Sales</div><div class="kpi-value">{fmt_inr_compact(sales_today)}</div><div class="kpi-meta">Posted sales vouchers</div></article>
-        <article class="kpi-card"><div class="kpi-label">Today’s Purchases</div><div class="kpi-value">{fmt_inr_compact(purchases_today)}</div><div class="kpi-meta">Posted purchase vouchers</div></article>
-        <article class="kpi-card"><div class="kpi-label">Stock Value</div><div class="kpi-value">{fmt_inr_compact(stock_value)}</div><div class="kpi-meta">Movement-led inventory value</div></article>
-        <article class="kpi-card"><div class="kpi-label">Stock Quantity</div><div class="kpi-value">{pieces:,.3f}</div><div class="kpi-meta">Pieces / units on hand</div></article>
-        <article class="kpi-card"><div class="kpi-label">Net Metal Weight</div><div class="kpi-value">{net_weight:,.3f}<span> g</span></div><div class="kpi-meta">Across active stock</div></article>
-      </div>
+        <section class="dashboard-bottom-row">
+          <article class="dashboard-panel voucher-panel">
+            <div class="panel-heading"><div><span>ACTIVITY</span><strong>Recent Vouchers</strong></div><em>View All</em></div>
+            {recent_table}
+          </article>
+          <aside class="legacy-card">
+            <span>TIMELESS VALUES</span>
+            <strong>BRIGHTER TOMORROWS</strong>
+            <div class="legacy-line"></div>
+            <div class="legacy-mark">◇</div>
+            <em>SHUBHRAJ JEWELS</em>
+          </aside>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
 
-      <div class="dashboard-grid dashboard-grid-top">
-        <article class="dashboard-panel">
-          <div class="panel-heading"><div><span>PERFORMANCE</span><strong>Monthly Sales</strong></div><em>Posted vouchers</em></div>
-          {chart_html}
-        </article>
-        <article class="dashboard-panel">
-          <div class="panel-heading"><div><span>PORTFOLIO</span><strong>Inventory Mix</strong></div><em>By stock value</em></div>
-          {donut_html}
-        </article>
-      </div>
-
-      <div class="dashboard-grid dashboard-grid-bottom">
-        <article class="dashboard-panel">
-          <div class="panel-heading"><div><span>ACTIVITY</span><strong>Recent Vouchers</strong></div><em>Latest postings</em></div>
-          {recent_table}
-        </article>
-        <article class="attention-card">
-          <div class="attention-top">
-            <div><span>ATTENTION</span><strong>Stock Watch</strong></div>
-            <div class="attention-count">{len(attention)}</div>
-          </div>
-          <p>Items at low on-hand levels based on their tracking mode.</p>
-          {attention_rows}
-        </article>
-      </div>
-    </section>
-    """
-    st.markdown(dashboard_html, unsafe_allow_html=True)
 
 def masters_page(cid: str):
     page_header("Masters", "Products, categories, locations and accounting ledgers")
@@ -979,20 +1014,61 @@ user=require_user(); setup_company_if_needed(user); cid=user.company_id
 comp=company(cid) or {"name":"Shubhraj Jewels"}
 with st.sidebar:
     st.markdown(
-        f"""
+        """
         <div class="sidebar-brand">
-          <div class="sidebar-monogram">SRJ</div>
-          <div class="sidebar-name">{comp.get('name','Shubhraj Jewels').upper()}</div>
-          <div class="sidebar-jewels">JEWELLERY ERP</div>
+          <div class="sidebar-name">SHUBHRAJ</div>
+          <div class="sidebar-jewels">JEWELS</div>
+          <div class="sidebar-tag">TRADITION ETERNAL.<br>VALUE FOREVER</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
+    menu_items = [
+        ("Dashboard", ":material/home:"),
+        ("Masters", ":material/database:"),
+        ("Opening Stock", ":material/inventory_2:"),
+        ("Sales Voucher", ":material/receipt_long:"),
+        ("Purchase Voucher", ":material/shopping_cart:"),
+        ("Accounting Vouchers", ":material/account_balance_wallet:"),
+        ("Stock Transfer", ":material/swap_horiz:"),
+        ("Inventory", ":material/category:"),
+        ("Reports", ":material/bar_chart:"),
+        ("Admin", ":material/settings:"),
+    ]
+
+    if "nav" not in st.session_state:
+        st.session_state.nav = "Dashboard"
+
+    for item_label, item_icon in menu_items:
+        if st.button(
+            item_label,
+            key=f"nav_{item_label}",
+            icon=item_icon,
+            type="primary" if st.session_state.nav == item_label else "secondary",
+            use_container_width=True,
+        ):
+            st.session_state.nav = item_label
+            st.rerun()
+
+    st.markdown(
+        """
+        <div class="sidebar-legacy">
+          <div class="sidebar-legacy-mark">◇</div>
+          <strong>MORE THAN<br>JEWELLERY</strong>
+          <span>A LASTING LEGACY</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     st.caption(f"{user.full_name or user.username or 'User'} · {user.role}")
-    nav=st.radio("Menu",["Dashboard","Masters","Opening Stock","Sales Voucher","Purchase Voucher","Accounting Vouchers","Stock Transfer","Inventory","Reports","Admin"],label_visibility="collapsed")
-    st.divider()
-    if st.button("Sign out",use_container_width=True):
-        sign_out(); st.session_state.clear(); st.rerun()
+    if st.button("Sign out", key="sign_out", icon=":material/logout:", use_container_width=True):
+        sign_out()
+        st.session_state.clear()
+        st.rerun()
+
+nav = st.session_state.get("nav", "Dashboard")
 
 try:
     if nav=="Dashboard": dashboard(cid)
