@@ -529,3 +529,33 @@ revoke execute on function public.seed_company_defaults(uuid) from public, anon,
 grant execute on function public.seed_company_defaults(uuid) to service_role;
 revoke execute on function public.cancel_voucher(uuid,uuid,uuid,text) from public, anon, authenticated;
 grant execute on function public.cancel_voucher(uuid,uuid,uuid,text) to service_role;
+
+
+-- ---------- production hardening ----------
+alter function public.financial_year_label(date) set search_path = public, pg_temp;
+alter function public.voucher_prefix(text) set search_path = public, pg_temp;
+alter table public.voucher_sequences enable row level security;
+alter view public.v_stock_summary set (security_invoker = true);
+alter view public.v_ledger_balances set (security_invoker = true);
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+
+drop policy if exists profile_self_read on public.profiles;
+create policy profile_self_read on public.profiles
+for select to authenticated
+using ((select auth.uid()) = user_id);
+
+create index if not exists idx_audit_logs_company on public.audit_logs(company_id);
+create index if not exists idx_audit_logs_user on public.audit_logs(user_id);
+create index if not exists idx_categories_parent on public.categories(parent_id);
+create index if not exists idx_inventory_location_fk on public.inventory_transactions(location_id);
+create index if not exists idx_inventory_product_fk on public.inventory_transactions(product_id);
+create index if not exists idx_inventory_voucher on public.inventory_transactions(voucher_id);
+create index if not exists idx_ledgers_group on public.ledgers(group_id);
+create index if not exists idx_products_category on public.products(category_id);
+create index if not exists idx_products_default_location on public.products(default_location_id);
+create index if not exists idx_profiles_company on public.profiles(company_id);
+create index if not exists idx_voucher_entries_ledger on public.voucher_entries(ledger_id);
+create index if not exists idx_voucher_items_location on public.voucher_items(location_id);
+create index if not exists idx_voucher_items_product on public.voucher_items(product_id);
+create index if not exists idx_vouchers_created_by on public.vouchers(created_by);
+create index if not exists idx_vouchers_party_ledger on public.vouchers(party_ledger_id);
