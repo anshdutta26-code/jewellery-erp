@@ -11,6 +11,7 @@ class SessionUser:
     id: str
     email: str
     full_name: str | None = None
+    username: str | None = None
     company_id: str | None = None
     role: str = "ADMIN"
 
@@ -55,17 +56,35 @@ def db_client() -> Client:
     return create_client(DEFAULT_SUPABASE_URL, server_key)
 
 
-def sign_in(email: str, password: str) -> SessionUser:
+def sign_in(username: str, password: str) -> SessionUser:
+    username = (username or "").strip().lower()
+    if not username:
+        raise RuntimeError("Username is required")
+
     auth = auth_client()
-    res = auth.auth.sign_in_with_password({"email": email, "password": password})
+    try:
+        resolved = auth.rpc("resolve_login_email", {"p_username": username}).execute().data
+    except Exception as exc:
+        raise RuntimeError("Could not resolve username") from exc
+
+    email = resolved if isinstance(resolved, str) else None
+    if not email:
+        raise RuntimeError("Invalid username or password")
+
+    try:
+        res = auth.auth.sign_in_with_password({"email": email, "password": password})
+    except Exception as exc:
+        raise RuntimeError("Invalid username or password") from exc
+
     if not res.user:
-        raise RuntimeError("Login failed")
+        raise RuntimeError("Invalid username or password")
+
     user_id = str(res.user.id)
     try:
         profile = (
             auth
             .table("profiles")
-            .select("user_id,company_id,full_name,role,active")
+            .select("user_id,company_id,full_name,username,role,active")
             .eq("user_id", user_id)
             .single()
             .execute()
@@ -73,12 +92,15 @@ def sign_in(email: str, password: str) -> SessionUser:
         )
     except Exception as exc:
         raise RuntimeError(f"Signed in, but profile access failed: {exc}") from exc
+
     if profile and not profile.get("active", True):
         raise RuntimeError("This user is inactive")
+
     return SessionUser(
         id=user_id,
         email=email,
         full_name=(profile or {}).get("full_name"),
+        username=(profile or {}).get("username") or username,
         company_id=(profile or {}).get("company_id"),
         role=(profile or {}).get("role") or "ADMIN",
     )
