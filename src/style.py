@@ -3710,6 +3710,203 @@ def inject_css() -> None:
           }
         }
 
+
+        /* ===== FINAL ASSET CORRECTION: factual visuals, clean KPI cards ===== */
+
+        .market-photo-img {
+          width: 70px !important;
+          height: 70px !important;
+          flex: 0 0 70px !important;
+          object-fit: contain !important;
+          object-position: center !important;
+          display: block !important;
+          padding: 5px !important;
+          border-radius: 12px !important;
+          border: 1px solid rgba(191,145,59,.22) !important;
+          background: #FFFDF8 !important;
+          box-shadow: 0 4px 12px rgba(57,39,23,.035) !important;
+        }
+
+        .st-key-gold_rate_card {
+          position: relative !important;
+          overflow: hidden !important;
+          min-height: 126px !important;
+        }
+
+        .st-key-gold_rate_card .rate-card-content {
+          padding-right: 96px !important;
+        }
+
+        .st-key-gold_rate_card .gold-selector-label {
+          position: absolute !important;
+          right: 18px !important;
+          top: 24px !important;
+          width: 68px !important;
+          margin: 0 !important;
+          color: #8D7246 !important;
+          font-size: .40rem !important;
+          font-weight: 700 !important;
+          letter-spacing: .14em !important;
+          text-align: center !important;
+          z-index: 8 !important;
+        }
+
+        .st-key-gold_rate_card [data-testid="stSelectbox"] {
+          position: absolute !important;
+          right: 16px !important;
+          top: 43px !important;
+          width: 74px !important;
+          min-width: 74px !important;
+          margin: 0 !important;
+          z-index: 10 !important;
+        }
+
+        .st-key-gold_rate_card [data-testid="stSelectbox"] > div,
+        .st-key-gold_rate_card [data-baseweb="select"] {
+          width: 74px !important;
+          min-width: 74px !important;
+          margin: 0 !important;
+        }
+
+        .st-key-gold_rate_card [data-baseweb="select"] > div {
+          min-height: 34px !important;
+          height: 34px !important;
+          border-radius: 8px !important;
+          border: 1px solid #C8973C !important;
+          background: #123E2C !important;
+          padding: 0 .35rem !important;
+          box-shadow: 0 4px 10px rgba(10,46,34,.08) !important;
+        }
+
+        .st-key-gold_rate_card [data-baseweb="select"] span,
+        .st-key-gold_rate_card [data-baseweb="select"] div {
+          color: #F2D784 !important;
+          font-size: .55rem !important;
+          font-weight: 700 !important;
+        }
+
+        .st-key-gold_rate_card [data-baseweb="select"] svg {
+          display: block !important;
+          color: #F2D784 !important;
+          fill: #F2D784 !important;
+        }
+
+        /* Operational cards: no decorative product artwork. */
+        .executive-kpi .kpi-jewel-accent,
+        .executive-kpi .kpi-product,
+        .executive-kpi .product-necklace,
+        .executive-kpi .product-ring,
+        .executive-kpi .product-bars,
+        .executive-kpi .product-bangle,
+        .executive-kpi .metal-collection,
+        .executive-kpi .metal-total-mark {
+          display: none !important;
+        }
+
+        .executive-kpi::before,
+        .executive-kpi::after {
+          content: none !important;
+          display: none !important;
+        }
+
+        .executive-kpi {
+          min-height: 112px !important;
+          overflow: hidden !important;
+          background: rgba(255,253,248,.96) !important;
+        }
+
+        .executive-kpi > div:nth-child(2) {
+          padding-right: 0 !important;
+        }
+
+        .metal-total-card {
+          grid-template-columns: 28px minmax(0,1fr) !important;
+          min-height: 124px !important;
+          background: rgba(255,253,248,.96) !important;
+        }
+
+        .metal-breakdown {
+          display: flex !important;
+          flex-wrap: wrap !important;
+          gap: .28rem !important;
+          margin-top: .42rem !important;
+        }
+
+        .metal-breakdown span {
+          padding: .18rem .34rem !important;
+          border-radius: 999px !important;
+          border: 1px solid rgba(151,121,76,.13) !important;
+          background: #F8F3E9 !important;
+          color: #776C61 !important;
+          font-size: .40rem !important;
+          white-space: nowrap !important;
+        }
+
+        .metal-breakdown b {
+          color: #5C4938 !important;
+          font-weight: 700 !important;
+        }
+
+        @media (max-width: 900px) {
+          .market-photo-img,
+          .market-photo {
+            width: 64px !important;
+            height: 64px !important;
+            flex-basis: 64px !important;
+          }
+
+          .st-key-gold_rate_card {
+            min-height: 118px !important;
+          }
+
+          .st-key-gold_rate_card .rate-card-content {
+            padding-right: 88px !important;
+          }
+
+          .st-key-gold_rate_card .gold-selector-label {
+            right: 13px !important;
+            top: 22px !important;
+            width: 64px !important;
+            font-size: .38rem !important;
+          }
+
+          .st-key-gold_rate_card [data-testid="stSelectbox"] {
+            right: 11px !important;
+            top: 40px !important;
+            width: 68px !important;
+            min-width: 68px !important;
+          }
+
+          .st-key-gold_rate_card [data-testid="stSelectbox"] > div,
+          .st-key-gold_rate_card [data-baseweb="select"] {
+            width: 68px !important;
+            min-width: 68px !important;
+          }
+
+          .st-key-gold_rate_card [data-baseweb="select"] > div {
+            min-height: 32px !important;
+            height: 32px !important;
+          }
+
+          .executive-kpi {
+            min-height: 106px !important;
+          }
+
+          .metal-total-card {
+            grid-template-columns: 28px minmax(0,1fr) !important;
+            min-height: 124px !important;
+          }
+
+          .metal-breakdown {
+            gap: .20rem !important;
+          }
+
+          .metal-breakdown span {
+            font-size: .37rem !important;
+            padding: .16rem .28rem !important;
+          }
+        }
+
         </style>
         """,
         unsafe_allow_html=True,
