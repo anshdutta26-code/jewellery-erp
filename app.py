@@ -266,6 +266,17 @@ def dashboard(cid: str):
     stock_value = sum(float(x.get("stock_value") or 0) for x in stock)
     pieces = sum(float(x.get("quantity") or 0) for x in stock)
     net_weight = sum(float(x.get("net_weight") or 0) for x in stock)
+    metal_totals: dict[str, float] = {}
+    for row in stock:
+        metal_name = str(row.get("metal") or "Other").strip().title() or "Other"
+        metal_totals[metal_name] = metal_totals.get(metal_name, 0.0) + float(row.get("net_weight") or 0)
+    preferred_metals = ["Gold", "Silver", "Platinum"]
+    ordered_metals = preferred_metals + sorted(k for k in metal_totals if k not in preferred_metals)
+    metal_breakdown_html = "".join(
+        f'<span><b>{escape(name)}</b> {metal_totals.get(name, 0.0):,.3f} g</span>'
+        for name in ordered_metals
+        if name in metal_totals or name in preferred_metals
+    )
 
     rates = india_market_rates()
     updated_at = rates.get("updated_at")
@@ -388,7 +399,7 @@ def dashboard(cid: str):
           <article class="executive-kpi"><div class="kpi-glyph">▣</div><div><span>TODAY'S PURCHASES</span><strong>{fmt_inr_compact(purchases_today)}</strong><em>Purchase register</em></div><div class="kpi-jewel-accent ring-accent" aria-hidden="true"><span>◇</span><i></i></div></article>
           <article class="executive-kpi"><div class="kpi-glyph">◫</div><div><span>STOCK VALUE</span><strong>{fmt_inr_compact(stock_value)}</strong><em>As on {now_india.strftime("%d %b %Y")}</em></div><div class="kpi-jewel-accent bars-accent" aria-hidden="true"><span></span><i></i><b></b></div></article>
           <article class="executive-kpi"><div class="kpi-glyph">◇</div><div><span>STOCK QTY</span><strong>{pieces:,.0f}<small> pcs</small></strong><em>Across all categories</em></div><div class="kpi-jewel-accent bangle-accent" aria-hidden="true"><span></span><i></i></div></article>
-          <article class="executive-kpi metal-total-card"><div class="kpi-glyph">⚖</div><div><span>TOTAL NET METAL WEIGHT</span><strong>{net_weight:,.3f}<small> g</small></strong><em>Gold · Diamond · Silver collection</em></div><div class="metal-collection" aria-label="Gold Diamond Silver"><span class="metal-gold">Au</span><span class="metal-diamond">◇</span><span class="metal-silver">Ag</span></div></article>
+          <article class="executive-kpi metal-total-card"><div class="kpi-glyph">⚖</div><div><span>TOTAL NET METAL WEIGHT</span><strong>{net_weight:,.3f}<small> g</small></strong><div class="metal-breakdown">{metal_breakdown_html}</div></div><div class="metal-collection" aria-label="Metal collection"><span class="metal-gold">Au</span><span class="metal-silver">Ag</span><span class="metal-platinum">Pt</span></div></article>
         </section>
         """,
         unsafe_allow_html=True,
