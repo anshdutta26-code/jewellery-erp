@@ -296,7 +296,7 @@ def dashboard(cid: str):
 
         <section class="brand-banner">
           <div class="banner-copy left"><span>EXQUISITE PIECES</span><strong>EXCEPTIONAL JOURNEYS</strong></div>
-          <div class="banner-center"><span class="banner-mark">◇</span><strong>SHUBHRAJ JEWELS</strong><em>A LEGACY IN EVERY SPARKLE</em></div>
+          <div class="banner-center"><img class="banner-logo-img" src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.png" alt="Shubhraj Jewels logo"><strong>SHUBHRAJ JEWELS</strong><em>A LEGACY IN EVERY SPARKLE</em></div>
           <div class="banner-arch"><div class="jewel-display">◇</div></div>
           <div class="banner-copy right"><span>CRAFTING</span><strong>A BRIGHTER TOMORROW</strong></div>
         </section>
@@ -1016,6 +1016,23 @@ def admin_page(cid: str, user):
 
 user=require_user(); setup_company_if_needed(user); cid=user.company_id
 comp=company(cid) or {"name":"Shubhraj Jewels"}
+
+menu_items = [
+    ("Dashboard", ":material/home:"),
+    ("Masters", ":material/database:"),
+    ("Opening Stock", ":material/inventory_2:"),
+    ("Sales Voucher", ":material/receipt_long:"),
+    ("Purchase Voucher", ":material/shopping_cart:"),
+    ("Accounting Vouchers", ":material/account_balance_wallet:"),
+    ("Stock Transfer", ":material/swap_horiz:"),
+    ("Inventory", ":material/category:"),
+    ("Reports", ":material/bar_chart:"),
+    ("Admin", ":material/settings:"),
+]
+
+if "nav" not in st.session_state:
+    st.session_state.nav = "Dashboard"
+
 with st.sidebar:
     st.markdown(
         """
@@ -1027,22 +1044,6 @@ with st.sidebar:
         """,
         unsafe_allow_html=True,
     )
-
-    menu_items = [
-        ("Dashboard", ":material/home:"),
-        ("Masters", ":material/database:"),
-        ("Opening Stock", ":material/inventory_2:"),
-        ("Sales Voucher", ":material/receipt_long:"),
-        ("Purchase Voucher", ":material/shopping_cart:"),
-        ("Accounting Vouchers", ":material/account_balance_wallet:"),
-        ("Stock Transfer", ":material/swap_horiz:"),
-        ("Inventory", ":material/category:"),
-        ("Reports", ":material/bar_chart:"),
-        ("Admin", ":material/settings:"),
-    ]
-
-    if "nav" not in st.session_state:
-        st.session_state.nav = "Dashboard"
 
     for item_label, item_icon in menu_items:
         if st.button(
@@ -1066,11 +1067,39 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
-    st.caption(f"{user.full_name or user.username or 'User'} · {user.role}")
+    st.caption(f"{user.full_name or 'Admin'} · {user.username or 'Developer'}")
     if st.button("Sign out", key="sign_out", icon=":material/logout:", use_container_width=True):
         sign_out()
         st.session_state.clear()
         st.rerun()
+
+with st.container(key="mobile_nav_shell"):
+    with st.popover("Menu", icon=":material/menu:", use_container_width=False):
+        st.markdown(
+            """
+            <div class="mobile-nav-brand">
+              <img src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.png" alt="Shubhraj Jewels">
+              <div><strong>SHUBHRAJ JEWELS</strong><span>ERP</span></div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        for item_label, item_icon in menu_items:
+            if st.button(
+                item_label,
+                key=f"mnav_{item_label}",
+                icon=item_icon,
+                type="primary" if st.session_state.nav == item_label else "secondary",
+                use_container_width=True,
+            ):
+                st.session_state.nav = item_label
+                st.rerun()
+        st.divider()
+        st.caption(f"{user.full_name or 'Admin'} · {user.username or 'Developer'}")
+        if st.button("Sign out", key="mobile_sign_out", icon=":material/logout:", use_container_width=True):
+            sign_out()
+            st.session_state.clear()
+            st.rerun()
 
 nav = st.session_state.get("nav", "Dashboard")
 
