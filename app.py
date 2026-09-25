@@ -1,8 +1,10 @@
 # deployment-refresh: shubhraj-theme
 from __future__ import annotations
 
+import base64
 from datetime import date, datetime
 from io import BytesIO
+from pathlib import Path
 from html import escape
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -33,6 +35,15 @@ from src.style import inject_css, page_header
 
 st.set_page_config(page_title="Shubhraj Jewels ERP", page_icon="💎", layout="wide", initial_sidebar_state="auto")
 inject_css()
+
+@st.cache_data(show_spinner=False)
+def brand_logo_uri() -> str:
+    logo_path = Path(__file__).resolve().parent / "assets" / "srj_logo.png"
+    payload = base64.b64encode(logo_path.read_bytes()).decode("ascii")
+    return f"data:image/png;base64,{payload}"
+
+
+BRAND_LOGO_URI = brand_logo_uri()
 
 
 def fmt_inr(v: Any) -> str:
@@ -70,9 +81,9 @@ def require_user():
         return st.session_state.user
 
     st.markdown(
-        """
-        <div class="login-brand">
-          <img class="login-logo-img" src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.webp" alt="Shubhraj Jewels">
+        f"""
+        <div class="login-brand login-page-marker">
+          <img class="login-logo-img" src="{BRAND_LOGO_URI}" alt="Shubhraj Jewels">
           <div class="tag">HERITAGE · CRAFTSMANSHIP · CONTROL</div>
           <div class="headline">Shubhraj Jewels ERP</div>
           <div class="strap">Accounts, inventory and jewellery operations in one secure system.</div>
@@ -265,9 +276,9 @@ def dashboard(cid: str):
     gold_18_10g = gold_24_10g * 18 / 24 if gold_24_10g else None
     silver_1kg = float(rates.get("silver_999") or 0) * 1000 if rates.get("silver_999") is not None else None
     diamond_1ct = rates.get("diamond_1ct")
-    if "gold_purity" not in st.session_state:
-        st.session_state.gold_purity = "24K"
-    selected_purity = st.session_state.gold_purity
+    if "gold_purity_select" not in st.session_state:
+        st.session_state.gold_purity_select = "24K"
+    selected_purity = st.session_state.gold_purity_select
     gold_rates = {"24K": gold_24_10g, "22K": gold_22_10g, "18K": gold_18_10g}
     selected_gold_rate = gold_rates.get(selected_purity, gold_24_10g)
 
@@ -296,60 +307,75 @@ def dashboard(cid: str):
 
         <section class="brand-banner">
           <div class="banner-copy left"><span>EXQUISITE PIECES</span><strong>EXCEPTIONAL JOURNEYS</strong></div>
-          <div class="banner-center"><img class="banner-logo-img" src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.webp" alt="Shubhraj Jewels logo"><strong>SHUBHRAJ JEWELS</strong><em>A LEGACY IN EVERY SPARKLE</em></div>
+          <div class="banner-center"><img class="banner-logo-img" src="{BRAND_LOGO_URI}" alt="Shubhraj Jewels logo"><strong>SHUBHRAJ JEWELS</strong><em>A LEGACY IN EVERY SPARKLE</em></div>
           <div class="banner-arch"><div class="jewel-display">◇</div></div>
           <div class="banner-copy right"><span>CRAFTING</span><strong>A BRIGHTER TOMORROW</strong></div>
-        </section>
-
-        <section class="rate-matrix">
-          <article class="market-cell gold-cell">
-            <div class="market-photo rate-photo-gold" aria-hidden="true"></div>
-            <div class="market-copy">
-              <span>GOLD · {selected_purity}</span>
-              <strong>{money_rate(selected_gold_rate)} <small>/ 10g</small></strong>
-              <em>{selected_purity} · 10 grams</em>
-            </div>
-          </article>
-          <article class="market-cell diamond-cell">
-            <div class="market-photo rate-photo-diamond" aria-hidden="true"></div>
-            <div class="market-copy">
-              <span>DIAMOND · NATURAL</span>
-              <strong>{money_rate(diamond_1ct)} <small>/ 1ct</small></strong>
-              <em>1 carat</em>
-            </div>
-          </article>
-          <article class="market-cell silver-cell">
-            <div class="market-photo rate-photo-silver" aria-hidden="true"></div>
-            <div class="market-copy">
-              <span>SILVER · 999</span>
-              <strong>{money_rate(silver_1kg)} <small>/ 1kg</small></strong>
-              <em>999 purity · 1 kilogram</em>
-            </div>
-          </article>
-          <div class="market-updated"><span></span>{updated_label}</div>
         </section>
         """,
         unsafe_allow_html=True,
     )
 
-    with st.container(key="gold_purity_control"):
-        st.markdown('<span class="purity-label">GOLD PURITY</span>', unsafe_allow_html=True)
-        if hasattr(st, "segmented_control"):
-            st.segmented_control(
-                "Gold Purity",
-                ["24K", "22K", "18K"],
-                key="gold_purity",
-                label_visibility="collapsed",
-            )
-        else:
-            st.radio(
-                "Gold Purity",
-                ["24K", "22K", "18K"],
-                index=["24K", "22K", "18K"].index(selected_purity),
-                key="gold_purity",
-                horizontal=True,
-                label_visibility="collapsed",
-            )
+    with st.container(key="rate_cards_shell"):
+        gold_col, diamond_col, silver_col = st.columns(3, gap="small")
+
+        with gold_col:
+            with st.container(key="gold_rate_card"):
+                st.markdown(
+                    f"""
+                    <div class="rate-card-content">
+                      <div class="market-photo rate-photo-gold" aria-hidden="true"></div>
+                      <div class="market-copy">
+                        <span>GOLD · {selected_purity}</span>
+                        <strong>{money_rate(selected_gold_rate)} <small>/ 10g</small></strong>
+                        <em>{selected_purity} · 10 grams</em>
+                      </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+                st.selectbox(
+                    "Gold purity",
+                    ["24K", "22K", "18K"],
+                    key="gold_purity_select",
+                    label_visibility="collapsed",
+                )
+
+        with diamond_col:
+            with st.container(key="diamond_rate_card"):
+                st.markdown(
+                    f"""
+                    <div class="rate-card-content">
+                      <div class="market-photo rate-photo-diamond" aria-hidden="true"></div>
+                      <div class="market-copy">
+                        <span>DIAMOND · NATURAL</span>
+                        <strong>{money_rate(diamond_1ct)} <small>/ 1ct</small></strong>
+                        <em>1 carat</em>
+                      </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+        with silver_col:
+            with st.container(key="silver_rate_card"):
+                st.markdown(
+                    f"""
+                    <div class="rate-card-content">
+                      <div class="market-photo rate-photo-silver" aria-hidden="true"></div>
+                      <div class="market-copy">
+                        <span>SILVER · 999</span>
+                        <strong>{money_rate(silver_1kg)} <small>/ 1kg</small></strong>
+                        <em>999 purity · 1 kilogram</em>
+                      </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+    st.markdown(
+        f'<div class="market-updated-inline"><span></span>Rates updated {updated_label}</div>',
+        unsafe_allow_html=True,
+    )
 
     st.markdown(
         f"""
@@ -358,7 +384,7 @@ def dashboard(cid: str):
           <article class="executive-kpi"><div class="kpi-glyph">▣</div><div><span>TODAY'S PURCHASES</span><strong>{fmt_inr_compact(purchases_today)}</strong><em>Purchase register</em></div><div class="kpi-product product-ring" aria-hidden="true"></div></article>
           <article class="executive-kpi"><div class="kpi-glyph">◫</div><div><span>STOCK VALUE</span><strong>{fmt_inr_compact(stock_value)}</strong><em>As on {now_india.strftime("%d %b %Y")}</em></div><div class="kpi-product product-bars" aria-hidden="true"></div></article>
           <article class="executive-kpi"><div class="kpi-glyph">◇</div><div><span>STOCK QTY</span><strong>{pieces:,.0f}<small> pcs</small></strong><em>Across all categories</em></div><div class="kpi-product product-bangle" aria-hidden="true"></div></article>
-          <article class="executive-kpi"><div class="kpi-glyph">⚖</div><div><span>NET METAL WEIGHT</span><strong>{net_weight:,.3f}<small> g</small></strong><em>Purity-wise consolidated</em></div><div class="kpi-product product-silver" aria-hidden="true"></div></article>
+          <article class="executive-kpi metal-total-card"><div class="kpi-glyph">⚖</div><div><span>TOTAL NET METAL WEIGHT</span><strong>{net_weight:,.3f}<small> g</small></strong><em>All metals · complete inventory</em></div><div class="metal-total-mark">Σ</div></article>
         </section>
         """,
         unsafe_allow_html=True,
@@ -1094,9 +1120,9 @@ with st.sidebar:
 with st.container(key="mobile_nav_shell"):
     with st.popover("Menu", icon=":material/menu:", use_container_width=False):
         st.markdown(
-            """
+            f"""
             <div class="mobile-nav-brand">
-              <img src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.webp" alt="Shubhraj Jewels">
+              <img src="{BRAND_LOGO_URI}" alt="Shubhraj Jewels">
               <div><strong>SHUBHRAJ JEWELS</strong><span>ERP</span></div>
             </div>
             """,
@@ -1107,7 +1133,7 @@ with st.container(key="mobile_nav_shell"):
                 item_label,
                 key=f"mnav_{item_label}",
                 icon=item_icon,
-                type="primary" if st.session_state.nav == item_label else "secondary",
+                type="secondary",
                 use_container_width=True,
             ):
                 st.session_state.nav = item_label
