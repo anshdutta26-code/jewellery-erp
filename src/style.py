@@ -3907,6 +3907,305 @@ def inject_css() -> None:
           }
         }
 
+
+        /* ===== APPROVED DESKTOP LOCK: permanent rail + approved ERP composition ===== */
+        @media (min-width: 901px) {
+          :root {
+            --srj-desktop-rail: 232px;
+          }
+
+          /* Permanent desktop navigation: never collapses, never disappears. */
+          [data-testid="stSidebar"],
+          section[data-testid="stSidebar"],
+          [data-testid="stSidebar"][aria-expanded="false"],
+          [data-testid="stSidebar"][aria-expanded="true"] {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            transform: none !important;
+            translate: none !important;
+            position: fixed !important;
+            inset: 0 auto 0 0 !important;
+            width: var(--srj-desktop-rail) !important;
+            min-width: var(--srj-desktop-rail) !important;
+            max-width: var(--srj-desktop-rail) !important;
+            height: 100vh !important;
+            z-index: 1000000 !important;
+            overflow: hidden !important;
+            background:
+              radial-gradient(circle at 8% 88%, rgba(196,148,52,.16), transparent 13rem),
+              linear-gradient(180deg, #3A291B 0%, #1E180F 100%) !important;
+            border-right: 1px solid rgba(193,151,67,.45) !important;
+            box-shadow: 10px 0 28px rgba(57,38,20,.08) !important;
+          }
+
+          [data-testid="stSidebar"] > div:first-child,
+          [data-testid="stSidebar"] [data-testid="stSidebarContent"] {
+            width: var(--srj-desktop-rail) !important;
+            min-width: var(--srj-desktop-rail) !important;
+            max-width: var(--srj-desktop-rail) !important;
+            height: 100vh !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            padding: .55rem .48rem .75rem !important;
+            scrollbar-width: none !important;
+          }
+
+          [data-testid="stSidebar"] > div:first-child::-webkit-scrollbar,
+          [data-testid="stSidebar"] [data-testid="stSidebarContent"]::-webkit-scrollbar {
+            display: none !important;
+          }
+
+          /* Remove every desktop collapse / restore control completely. */
+          [data-testid="stSidebarCollapsedControl"],
+          [data-testid="collapsedControl"],
+          [data-testid="stSidebarHeader"],
+          [data-testid="stSidebar"] [data-testid="stBaseButton-headerNoPadding"],
+          button[aria-label*="Close sidebar"],
+          button[aria-label*="Open sidebar"],
+          button[aria-label*="Collapse sidebar"],
+          button[aria-label*="Expand sidebar"] {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+          }
+
+          /* The main app is permanently offset by the fixed rail. */
+          [data-testid="stAppViewContainer"] {
+            margin-left: var(--srj-desktop-rail) !important;
+            width: calc(100vw - var(--srj-desktop-rail)) !important;
+            max-width: calc(100vw - var(--srj-desktop-rail)) !important;
+            min-width: 0 !important;
+          }
+
+          [data-testid="stHeader"] {
+            left: var(--srj-desktop-rail) !important;
+            width: calc(100vw - var(--srj-desktop-rail)) !important;
+            background: transparent !important;
+            pointer-events: none !important;
+          }
+
+          .st-key-mobile_nav_shell {
+            display: none !important;
+          }
+
+          .block-container {
+            max-width: 1600px !important;
+            width: calc(100% - 18px) !important;
+            padding: .72rem .76rem 1rem !important;
+            margin: 0 auto !important;
+          }
+
+          /* Approved sidebar branding */
+          .sidebar-brand {
+            min-height: 104px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            padding: .7rem .35rem .65rem !important;
+            margin: 0 0 .55rem !important;
+            border-bottom: 1px solid rgba(223,193,126,.18) !important;
+            color: #F0D892 !important;
+          }
+
+          .sidebar-name {
+            color: #F0D892 !important;
+            font-size: 1.18rem !important;
+            line-height: 1 !important;
+            letter-spacing: .15em !important;
+          }
+
+          .sidebar-jewels {
+            color: rgba(244,220,157,.88) !important;
+            font-size: .48rem !important;
+            letter-spacing: .28em !important;
+            margin-top: .16rem !important;
+          }
+
+          .sidebar-tag {
+            margin-top: .48rem !important;
+            color: rgba(238,220,175,.64) !important;
+            font-size: .39rem !important;
+            line-height: 1.55 !important;
+            letter-spacing: .22em !important;
+            text-align: center !important;
+          }
+
+          [data-testid="stSidebar"] .stButton {
+            margin: .03rem 0 !important;
+          }
+
+          [data-testid="stSidebar"] .stButton > button,
+          [data-testid="stSidebar"] .stButton > button[data-testid="stBaseButton-primary"],
+          [data-testid="stSidebar"] .stButton > button[data-testid="stBaseButton-secondary"] {
+            width: 100% !important;
+            height: 39px !important;
+            min-height: 39px !important;
+            justify-content: flex-start !important;
+            padding: .35rem .62rem !important;
+            border-radius: 6px !important;
+            border: 1px solid transparent !important;
+            background: transparent !important;
+            color: #EFE5CA !important;
+            box-shadow: none !important;
+            text-transform: none !important;
+            letter-spacing: .005em !important;
+            font-size: .64rem !important;
+            font-weight: 500 !important;
+          }
+
+          [data-testid="stSidebar"] .stButton > button[data-testid="stBaseButton-primary"] {
+            background: linear-gradient(90deg, rgba(195,147,58,.25), rgba(195,147,58,.10)) !important;
+            border-color: rgba(224,188,112,.25) !important;
+            box-shadow: inset 3px 0 0 #D2A33A !important;
+            color: #FFF1C2 !important;
+          }
+
+          [data-testid="stSidebar"] .stButton > button:hover {
+            background: rgba(210,163,58,.09) !important;
+            color: #FFF1C2 !important;
+          }
+
+          [data-testid="stSidebar"] .stButton > button svg,
+          [data-testid="stSidebar"] .stButton > button span[data-testid="stIconMaterial"] {
+            color: #E7CC82 !important;
+            fill: #E7CC82 !important;
+            font-size: 17px !important;
+          }
+
+          .sidebar-legacy {
+            position: relative !important;
+            min-height: 158px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: .8rem .14rem .65rem !important;
+            padding: 1rem .5rem !important;
+            border: 1px solid rgba(209,163,68,.30) !important;
+            border-radius: 90px 90px 0 0 !important;
+            background:
+              radial-gradient(circle at 50% 100%, rgba(199,150,56,.11), transparent 6rem),
+              rgba(255,255,255,.015) !important;
+            color: #E7CE88 !important;
+            text-align: center !important;
+          }
+
+          .sidebar-legacy-mark {
+            color: #D2A33A !important;
+            font-size: 1.25rem !important;
+            margin-bottom: .55rem !important;
+          }
+
+          .sidebar-legacy strong {
+            color: #EEDB9D !important;
+            font-family: "Cormorant Garamond", Georgia, serif !important;
+            font-size: .68rem !important;
+            letter-spacing: .18em !important;
+            line-height: 1.35 !important;
+          }
+
+          .sidebar-legacy span {
+            margin-top: .3rem !important;
+            color: rgba(238,219,158,.65) !important;
+            font-size: .40rem !important;
+            letter-spacing: .17em !important;
+          }
+
+          [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {
+            color: rgba(239,221,172,.58) !important;
+            font-size: .50rem !important;
+            padding: 0 .34rem !important;
+          }
+
+          /* Desktop canvas matching approved mockup proportions. */
+          .executive-topbar {
+            min-height: 64px !important;
+            margin: 0 0 8px !important;
+            padding: .60rem .85rem !important;
+            border-radius: 0 !important;
+            border: 0 !important;
+            border-bottom: 1px solid rgba(169,127,63,.17) !important;
+            background:
+              radial-gradient(circle at 72% 30%, rgba(210,163,58,.08), transparent 12rem),
+              linear-gradient(90deg, rgba(255,253,248,.98), rgba(246,238,226,.92)) !important;
+            box-shadow: none !important;
+          }
+
+          .brand-banner {
+            min-height: 132px !important;
+            margin-bottom: 10px !important;
+            border-radius: 8px !important;
+            background:
+              radial-gradient(circle at 82% 50%, rgba(176,127,51,.22), transparent 10rem),
+              linear-gradient(105deg, #F8F3EA 0%, #F0E7DA 61%, #DEC7A7 100%) !important;
+          }
+
+          .rate-cards-shell,
+          .st-key-rate_cards_shell {
+            margin-bottom: 8px !important;
+          }
+
+          .market-updated-top {
+            margin-bottom: 5px !important;
+          }
+
+          .executive-kpis {
+            grid-template-columns: repeat(5, minmax(0,1fr)) !important;
+            gap: 9px !important;
+            margin-bottom: 9px !important;
+          }
+
+          .executive-kpi {
+            min-height: 108px !important;
+            border-radius: 8px !important;
+            padding: .68rem .66rem !important;
+            background:
+              linear-gradient(180deg, rgba(255,253,248,.99), rgba(249,245,237,.96)) !important;
+          }
+
+          .analytics-three {
+            grid-template-columns: minmax(0, 1.85fr) minmax(245px, .82fr) minmax(250px, .78fr) !important;
+            gap: 9px !important;
+            margin-bottom: 9px !important;
+          }
+
+          .dashboard-panel {
+            border-radius: 8px !important;
+            padding: .66rem .70rem !important;
+          }
+
+          .dashboard-bottom-row {
+            grid-template-columns: minmax(0, 3.35fr) minmax(225px, .72fr) !important;
+            gap: 9px !important;
+          }
+
+          .legacy-card {
+            min-height: 184px !important;
+            border-radius: 8px !important;
+            background:
+              radial-gradient(circle at 92% 74%, rgba(159,112,49,.22), transparent 6rem),
+              linear-gradient(135deg, #F4ECDD, #DCC5A6) !important;
+          }
+
+          /* Same approved visual language on every internal page. */
+          [data-testid="stForm"],
+          [data-testid="stDataFrame"],
+          [data-testid="stTable"],
+          div[data-testid="stMetric"],
+          .voucher-box {
+            border-radius: 8px !important;
+            border-color: rgba(177,133,57,.25) !important;
+            background: rgba(255,253,248,.97) !important;
+            box-shadow: 0 6px 18px rgba(45,29,16,.035) !important;
+          }
+
+          h1, h2, h3 {
+            color: #4E3727 !important;
+          }
+        }
+
         </style>
         """,
         unsafe_allow_html=True,
