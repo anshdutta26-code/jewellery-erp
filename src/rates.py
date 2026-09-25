@@ -60,12 +60,30 @@ def _india_daily_gold_silver() -> tuple[float | None, float | None, float | None
         response = requests.get("https://www.goodreturns.in/gold-rates/", timeout=8, headers=headers)
         response.raise_for_status()
         text = unescape(response.text)
-        m24 = re.search(r"₹\s*([\d,]+)\s*per gram for 24 karat", text, flags=re.I)
-        m22 = re.search(r"₹\s*([\d,]+)\s*per gram for 22 karat", text, flags=re.I)
-        if m24:
-            gold_24 = float(m24.group(1).replace(",", ""))
-        if m22:
-            gold_22 = float(m22.group(1).replace(",", ""))
+        plain = re.sub(r"<[^>]+>", " ", text)
+        plain = re.sub(r"\s+", " ", plain)
+        patterns24 = [
+            r"₹\s*([\d,]+)\s*per gram for 24 karat",
+            r"24K\s*Gold\s*/g\s*₹\s*([\d,]+)",
+            r"24 karat gold[^₹]{0,80}₹\s*([\d,]+)\s*per gram",
+            r"gold price in India stands at\s*₹\s*([\d,]+)\s*per gram for 24 karat",
+        ]
+        patterns22 = [
+            r"₹\s*([\d,]+)\s*per gram for 22 karat",
+            r"22K\s*Gold\s*/g\s*₹\s*([\d,]+)",
+            r"22 karat gold[^₹]{0,80}₹\s*([\d,]+)\s*per gram",
+            r"24 karat gold.*?₹\s*[\d,]+\s*per gram.*?₹\s*([\d,]+)\s*per gram for 22 karat",
+        ]
+        for pattern in patterns24:
+            m24 = re.search(pattern, plain, flags=re.I | re.S)
+            if m24:
+                gold_24 = float(m24.group(1).replace(",", ""))
+                break
+        for pattern in patterns22:
+            m22 = re.search(pattern, plain, flags=re.I | re.S)
+            if m22:
+                gold_22 = float(m22.group(1).replace(",", ""))
+                break
     except Exception:
         pass
 
@@ -73,9 +91,18 @@ def _india_daily_gold_silver() -> tuple[float | None, float | None, float | None
         response = requests.get("https://www.goodreturns.in/silver-rates/", timeout=8, headers=headers)
         response.raise_for_status()
         text = unescape(response.text)
-        ms = re.search(r"silver in India today is\s*₹\s*([\d,]+)\s*per gram", text, flags=re.I)
-        if ms:
-            silver = float(ms.group(1).replace(",", ""))
+        plain = re.sub(r"<[^>]+>", " ", text)
+        plain = re.sub(r"\s+", " ", plain)
+        patterns = [
+            r"silver in India today is\s*₹\s*([\d,]+)\s*per gram",
+            r"Silver\s*/g\s*₹\s*([\d,]+)",
+            r"price of silver in India today is\s*₹\s*([\d,]+)\s*per gram",
+        ]
+        for pattern in patterns:
+            ms = re.search(pattern, plain, flags=re.I | re.S)
+            if ms:
+                silver = float(ms.group(1).replace(",", ""))
+                break
     except Exception:
         pass
 
