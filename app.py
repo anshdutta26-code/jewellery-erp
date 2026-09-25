@@ -72,11 +72,7 @@ def require_user():
     st.markdown(
         """
         <div class="login-brand">
-          <div class="srj-seal" aria-label="Shubhraj Jewels">
-            <div class="srj-monogram">SRJ</div>
-            <div class="srj-name">SHUBHRAJ</div>
-            <div class="srj-jewels">JEWELS</div>
-          </div>
+          <img class="login-logo-img" src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.png" alt="Shubhraj Jewels">
           <div class="tag">HERITAGE · CRAFTSMANSHIP · CONTROL</div>
           <div class="headline">Shubhraj Jewels ERP</div>
           <div class="strap">Accounts, inventory and jewellery operations in one secure system.</div>
@@ -267,9 +263,13 @@ def dashboard(cid: str):
     diamond_source = escape(str(rates.get("diamond_source") or "India diamond benchmark"))
 
     gold_24_10g = float(rates.get("gold_24k") or 0) * 10 if rates.get("gold_24k") is not None else None
-    gold_22_10g = float(rates.get("gold_22k") or 0) * 10 if rates.get("gold_22k") is not None else None
+    gold_22_10g = float(rates.get("gold_22k") or 0) * 10 if rates.get("gold_22k") is not None else (gold_24_10g * 22 / 24 if gold_24_10g else None)
+    gold_18_10g = gold_24_10g * 18 / 24 if gold_24_10g else None
     silver_1kg = float(rates.get("silver_999") or 0) * 1000 if rates.get("silver_999") is not None else None
     diamond_1ct = rates.get("diamond_1ct")
+    selected_purity = st.session_state.get("gold_purity", "24K")
+    gold_rates = {"24K": gold_24_10g, "22K": gold_22_10g, "18K": gold_18_10g}
+    selected_gold_rate = gold_rates.get(selected_purity, gold_24_10g)
 
     def money_rate(value: Any) -> str:
         if value is None:
@@ -305,17 +305,17 @@ def dashboard(cid: str):
           <article class="market-cell gold-cell">
             <div class="market-photo rate-photo-gold" aria-hidden="true"></div>
             <div class="market-copy">
-              <span>GOLD · INDIA</span>
-              <strong>{money_rate(gold_24_10g)} <small>/ 10g</small></strong>
-              <em>24K · 22K {money_rate(gold_22_10g)} / 10g</em>
+              <span>GOLD · {selected_purity}</span>
+              <strong>{money_rate(selected_gold_rate)} <small>/ 10g</small></strong>
+              <em>10 grams · INR</em>
             </div>
           </article>
           <article class="market-cell diamond-cell">
             <div class="market-photo rate-photo-diamond" aria-hidden="true"></div>
             <div class="market-copy">
-              <span>NATURAL DIAMOND</span>
+              <span>DIAMOND · NATURAL</span>
               <strong>{money_rate(diamond_1ct)} <small>/ 1ct</small></strong>
-              <em>India benchmark · varies by 4Cs</em>
+              <em>1 carat · INR</em>
             </div>
           </article>
           <article class="market-cell silver-cell">
@@ -323,15 +323,37 @@ def dashboard(cid: str):
             <div class="market-copy">
               <span>SILVER · 999</span>
               <strong>{money_rate(silver_1kg)} <small>/ 1kg</small></strong>
-              <em>India market reference</em>
+              <em>1 kilogram · INR</em>
             </div>
           </article>
           <div class="market-updated"><span></span>{updated_label}</div>
         </section>
-        <div class="market-footnote">Rates are market references before GST, local premium and making charges. Gold source: {metal_source}. Diamond source: {diamond_source}.</div>
         """,
         unsafe_allow_html=True,
     )
+
+    with st.container(key="gold_purity_control"):
+        st.markdown('<span class="purity-label">GOLD PURITY</span>', unsafe_allow_html=True)
+        if hasattr(st, "segmented_control"):
+            choice = st.segmented_control(
+                "Gold Purity",
+                ["24K", "22K", "18K"],
+                default=selected_purity,
+                key="gold_purity",
+                label_visibility="collapsed",
+            )
+        else:
+            choice = st.radio(
+                "Gold Purity",
+                ["24K", "22K", "18K"],
+                index=["24K", "22K", "18K"].index(selected_purity),
+                key="gold_purity",
+                horizontal=True,
+                label_visibility="collapsed",
+            )
+        if choice and choice != selected_purity:
+            st.session_state.gold_purity = choice
+            st.rerun()
 
     st.markdown(
         f"""
