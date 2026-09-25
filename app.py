@@ -362,7 +362,7 @@ def dashboard(cid: str):
                 st.markdown(
                     f"""
                     <div class="rate-card-content">
-                      <div class="market-photo rate-photo-diamond" aria-hidden="true"></div>
+                      <img class="market-photo-img" src="https://cdn.openart.ai/openart-ai/production/2026-09/create-image/nZYR5b4V8EJxAuqsA6m5/gpt-image-2.5-sunburst-1_1790308236428_15d592f1.png" alt="Loose natural diamond">
                       <div class="market-copy">
                         <span>DIAMOND · NATURAL</span>
                         <strong>{money_rate(diamond_1ct)} <small>/ 1ct</small></strong>
@@ -378,7 +378,7 @@ def dashboard(cid: str):
                 st.markdown(
                     f"""
                     <div class="rate-card-content">
-                      <div class="market-photo rate-photo-silver" aria-hidden="true"></div>
+                      <img class="market-photo-img" src="https://cdn.openart.ai/openart-ai/production/2026-09/create-image/nZYR5b4V8EJxAuqsA6m5/gpt-image-2.5-sunburst-1_1790308238053_62b8cbca.png" alt="999 silver bullion bar">
                       <div class="market-copy">
                         <span>SILVER · 999</span>
                         <strong>{money_rate(silver_1kg)} <small>/ 1kg</small></strong>
