@@ -258,16 +258,16 @@ def dashboard(cid: str):
 
     rates = india_market_rates()
     updated_at = rates.get("updated_at")
-    updated_label = updated_at.strftime("%d %b · %I:%M %p IST") if updated_at else "Live market"
-    metal_source = escape(str(rates.get("metal_source") or "India market reference"))
-    diamond_source = escape(str(rates.get("diamond_source") or "India diamond benchmark"))
+    updated_label = updated_at.strftime("%d %b · %I:%M %p") if updated_at else "Live"
 
     gold_24_10g = float(rates.get("gold_24k") or 0) * 10 if rates.get("gold_24k") is not None else None
     gold_22_10g = float(rates.get("gold_22k") or 0) * 10 if rates.get("gold_22k") is not None else (gold_24_10g * 22 / 24 if gold_24_10g else None)
     gold_18_10g = gold_24_10g * 18 / 24 if gold_24_10g else None
     silver_1kg = float(rates.get("silver_999") or 0) * 1000 if rates.get("silver_999") is not None else None
     diamond_1ct = rates.get("diamond_1ct")
-    selected_purity = st.session_state.get("gold_purity", "24K")
+    if "gold_purity" not in st.session_state:
+        st.session_state.gold_purity = "24K"
+    selected_purity = st.session_state.gold_purity
     gold_rates = {"24K": gold_24_10g, "22K": gold_22_10g, "18K": gold_18_10g}
     selected_gold_rate = gold_rates.get(selected_purity, gold_24_10g)
 
@@ -307,7 +307,7 @@ def dashboard(cid: str):
             <div class="market-copy">
               <span>GOLD · {selected_purity}</span>
               <strong>{money_rate(selected_gold_rate)} <small>/ 10g</small></strong>
-              <em>10 grams · INR</em>
+              <em>{selected_purity} · 10 grams</em>
             </div>
           </article>
           <article class="market-cell diamond-cell">
@@ -315,7 +315,7 @@ def dashboard(cid: str):
             <div class="market-copy">
               <span>DIAMOND · NATURAL</span>
               <strong>{money_rate(diamond_1ct)} <small>/ 1ct</small></strong>
-              <em>1 carat · INR</em>
+              <em>1 carat</em>
             </div>
           </article>
           <article class="market-cell silver-cell">
@@ -323,7 +323,7 @@ def dashboard(cid: str):
             <div class="market-copy">
               <span>SILVER · 999</span>
               <strong>{money_rate(silver_1kg)} <small>/ 1kg</small></strong>
-              <em>1 kilogram · INR</em>
+              <em>999 purity · 1 kilogram</em>
             </div>
           </article>
           <div class="market-updated"><span></span>{updated_label}</div>
@@ -335,15 +335,14 @@ def dashboard(cid: str):
     with st.container(key="gold_purity_control"):
         st.markdown('<span class="purity-label">GOLD PURITY</span>', unsafe_allow_html=True)
         if hasattr(st, "segmented_control"):
-            choice = st.segmented_control(
+            st.segmented_control(
                 "Gold Purity",
                 ["24K", "22K", "18K"],
-                default=selected_purity,
                 key="gold_purity",
                 label_visibility="collapsed",
             )
         else:
-            choice = st.radio(
+            st.radio(
                 "Gold Purity",
                 ["24K", "22K", "18K"],
                 index=["24K", "22K", "18K"].index(selected_purity),
@@ -351,9 +350,6 @@ def dashboard(cid: str):
                 horizontal=True,
                 label_visibility="collapsed",
             )
-        if choice and choice != selected_purity:
-            st.session_state.gold_purity = choice
-            st.rerun()
 
     st.markdown(
         f"""
