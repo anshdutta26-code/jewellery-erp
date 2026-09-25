@@ -2772,6 +2772,533 @@ def inject_css() -> None:
           font-size: .58rem !important;
         }
 
+
+        /* ===== Client-ready production pass 2026-09-25 ===== */
+
+        /* Canonical SRJ logo treatment */
+        .login-logo-img {
+          display: block !important;
+          width: 132px !important;
+          height: 132px !important;
+          object-fit: contain !important;
+          object-position: center !important;
+          margin: .25rem auto .85rem !important;
+          border: 0 !important;
+          border-radius: 50% !important;
+          background: transparent !important;
+          box-shadow: 0 16px 34px rgba(10,46,34,.10) !important;
+          filter: none !important;
+        }
+
+        .banner-logo-img {
+          width: 72px !important;
+          height: 72px !important;
+          object-fit: contain !important;
+          object-position: center !important;
+          border: 0 !important;
+          border-radius: 50% !important;
+          background: transparent !important;
+          box-shadow: 0 8px 18px rgba(10,46,34,.09) !important;
+          filter: none !important;
+        }
+
+        .login-brand {
+          position: relative;
+          isolation: isolate;
+        }
+
+        .login-brand::before {
+          content: "";
+          position: absolute;
+          width: 210px;
+          height: 210px;
+          left: 50%;
+          top: -24px;
+          transform: translateX(-50%);
+          z-index: -1;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(210,163,58,.13) 0%, rgba(210,163,58,.035) 46%, transparent 72%);
+          pointer-events: none;
+        }
+
+        /* Real cue cards with Gold selector INSIDE the gold card */
+        .st-key-rate_cards_shell {
+          margin: .55rem 0 .32rem !important;
+        }
+
+        .st-key-rate_cards_shell [data-testid="stHorizontalBlock"] {
+          gap: 10px !important;
+          align-items: stretch !important;
+        }
+
+        .st-key-rate_cards_shell [data-testid="column"] {
+          min-width: 0 !important;
+        }
+
+        .st-key-gold_rate_card,
+        .st-key-diamond_rate_card,
+        .st-key-silver_rate_card {
+          position: relative !important;
+          min-height: 126px !important;
+          height: 100% !important;
+          padding: .78rem .82rem !important;
+          overflow: hidden !important;
+          border-radius: 12px !important;
+          border: 1px solid rgba(183,136,53,.25) !important;
+          background:
+            linear-gradient(135deg, rgba(255,253,248,.98), rgba(250,245,236,.94)) !important;
+          box-shadow:
+            0 8px 24px rgba(47,31,18,.04),
+            inset 0 1px 0 rgba(255,255,255,.88) !important;
+        }
+
+        .st-key-gold_rate_card::after,
+        .st-key-diamond_rate_card::after,
+        .st-key-silver_rate_card::after {
+          content: "";
+          position: absolute;
+          width: 88px;
+          height: 88px;
+          right: -38px;
+          bottom: -42px;
+          border: 1px solid rgba(210,163,58,.12);
+          border-radius: 50%;
+          pointer-events: none;
+        }
+
+        .rate-card-content {
+          display: flex !important;
+          align-items: center !important;
+          gap: .78rem !important;
+          min-height: 96px !important;
+          position: relative !important;
+          z-index: 1 !important;
+        }
+
+        .st-key-gold_rate_card .rate-card-content {
+          padding-right: 82px !important;
+        }
+
+        .market-photo {
+          width: 68px !important;
+          height: 68px !important;
+          flex: 0 0 68px !important;
+          border-radius: 12px !important;
+          border: 1px solid rgba(191,145,59,.24) !important;
+          background-size: 500% auto !important;
+          background-repeat: no-repeat !important;
+          background-position-y: center !important;
+          background-color: #FFFDF9 !important;
+          box-shadow: 0 4px 12px rgba(57,39,23,.04) !important;
+          overflow: hidden !important;
+        }
+
+        .rate-photo-gold { background-position-x: 50% !important; }
+        .rate-photo-diamond { background-position-x: 25% !important; }
+        .rate-photo-silver { background-position-x: 100% !important; }
+
+        .market-copy {
+          min-width: 0 !important;
+        }
+
+        .market-copy span {
+          color: #7B6857 !important;
+          font-size: .56rem !important;
+          letter-spacing: .13em !important;
+          font-weight: 700 !important;
+          white-space: nowrap !important;
+        }
+
+        .market-copy strong {
+          display: block !important;
+          margin-top: .22rem !important;
+          color: #103C2B !important;
+          font-family: "Cormorant Garamond", Georgia, serif !important;
+          font-size: 1.55rem !important;
+          line-height: 1 !important;
+          font-weight: 700 !important;
+          white-space: nowrap !important;
+        }
+
+        .market-copy strong small {
+          color: #7E817C !important;
+          font-family: "Montserrat", sans-serif !important;
+          font-size: .52rem !important;
+          font-weight: 600 !important;
+        }
+
+        .market-copy em {
+          display: block !important;
+          margin-top: .27rem !important;
+          color: #A09182 !important;
+          font-size: .48rem !important;
+          font-style: normal !important;
+        }
+
+        /* The selected purity is the only value shown; tapping it exposes the other choices. */
+        .st-key-gold_rate_card [data-testid="stSelectbox"] {
+          position: absolute !important;
+          top: .72rem !important;
+          right: .72rem !important;
+          width: 72px !important;
+          z-index: 8 !important;
+        }
+
+        .st-key-gold_rate_card [data-testid="stSelectbox"] > div {
+          margin: 0 !important;
+        }
+
+        .st-key-gold_rate_card [data-baseweb="select"] > div {
+          min-height: 32px !important;
+          height: 32px !important;
+          padding: 0 .35rem !important;
+          border-radius: 999px !important;
+          border: 1px solid #D2A33A !important;
+          background: #103C2B !important;
+          box-shadow: 0 4px 10px rgba(10,46,34,.10) !important;
+        }
+
+        .st-key-gold_rate_card [data-baseweb="select"] span,
+        .st-key-gold_rate_card [data-baseweb="select"] div {
+          color: #F4D98C !important;
+          font-size: .56rem !important;
+          font-weight: 700 !important;
+        }
+
+        .st-key-gold_rate_card [data-baseweb="select"] svg {
+          color: #F4D98C !important;
+          fill: #F4D98C !important;
+        }
+
+        .market-updated-inline {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: .34rem;
+          margin: .08rem .15rem .68rem;
+          color: #8A918C;
+          font-size: .45rem;
+          letter-spacing: .025em;
+        }
+
+        .market-updated-inline span {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #2B8B5A;
+          box-shadow: 0 0 0 3px rgba(43,139,90,.10);
+        }
+
+        /* KPI photography: decorative, contained, never dominant or cropped across products */
+        .executive-kpi {
+          min-height: 118px !important;
+          overflow: hidden !important;
+        }
+
+        .executive-kpi > div:nth-child(2) {
+          padding-right: 54px !important;
+          position: relative !important;
+          z-index: 2 !important;
+        }
+
+        .kpi-product {
+          width: 60px !important;
+          height: 48px !important;
+          right: 9px !important;
+          bottom: 9px !important;
+          border-radius: 10px !important;
+          opacity: .78 !important;
+          background-size: 500% auto !important;
+          background-repeat: no-repeat !important;
+          background-position-y: center !important;
+          background-color: rgba(255,253,248,.72) !important;
+          box-shadow: 0 3px 10px rgba(62,42,22,.035) !important;
+          -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 24%, black 100%) !important;
+          mask-image: linear-gradient(90deg, transparent 0%, black 24%, black 100%) !important;
+        }
+
+        .product-necklace { background-position-x: 2% !important; }
+        .product-ring { background-position-x: 25% !important; }
+        .product-bars { background-position-x: 50% !important; }
+        .product-bangle {
+          width: 54px !important;
+          background-position-x: 72% !important;
+          clip-path: inset(0 8% 0 8%) !important;
+        }
+
+        .metal-total-card {
+          background:
+            radial-gradient(circle at 92% 70%, rgba(210,163,58,.08), transparent 5.5rem),
+            rgba(255,253,248,.94) !important;
+        }
+
+        .metal-total-mark {
+          position: absolute;
+          right: 17px;
+          bottom: 4px;
+          color: rgba(183,138,55,.18);
+          font-family: "Cormorant Garamond", Georgia, serif !important;
+          font-size: 3.2rem;
+          font-weight: 600;
+          line-height: 1;
+          pointer-events: none;
+        }
+
+        /* Mobile navigation: clean website-style trigger + compact luxury list */
+        @media (max-width: 900px) {
+          .block-container {
+            padding-top: 4.3rem !important;
+          }
+
+          .st-key-mobile_nav_shell {
+            display: block !important;
+            position: fixed !important;
+            top: 10px !important;
+            left: 14px !important;
+            right: auto !important;
+            width: 42px !important;
+            height: 42px !important;
+            z-index: 1000012 !important;
+          }
+
+          .st-key-mobile_nav_shell [data-testid="stPopover"] > button,
+          .st-key-mobile_nav_shell > div > button,
+          .st-key-mobile_nav_shell button {
+            position: relative !important;
+            width: 42px !important;
+            height: 42px !important;
+            min-width: 42px !important;
+            min-height: 42px !important;
+            padding: 0 !important;
+            border-radius: 9px !important;
+            border: 1px solid rgba(225,190,99,.54) !important;
+            background: linear-gradient(180deg, #164633, #0D3527) !important;
+            box-shadow: 0 5px 14px rgba(10,46,34,.14) !important;
+            color: transparent !important;
+            font-size: 0 !important;
+            overflow: hidden !important;
+          }
+
+          .st-key-mobile_nav_shell button * {
+            display: none !important;
+            visibility: hidden !important;
+          }
+
+          .st-key-mobile_nav_shell button::before {
+            content: "" !important;
+            display: block !important;
+            position: absolute !important;
+            width: 20px !important;
+            height: 14px !important;
+            left: 10px !important;
+            top: 13px !important;
+            background:
+              linear-gradient(#E8CC7A,#E8CC7A) 0 0/20px 2px no-repeat,
+              linear-gradient(#E8CC7A,#E8CC7A) 0 6px/20px 2px no-repeat,
+              linear-gradient(#E8CC7A,#E8CC7A) 0 12px/20px 2px no-repeat !important;
+          }
+
+          .st-key-mobile_nav_shell button::after {
+            content: none !important;
+            display: none !important;
+          }
+
+          [data-testid="stHeader"]::before {
+            content: "SHUBHRAJ JEWELS" !important;
+            display: block !important;
+            position: fixed !important;
+            left: 74px !important;
+            top: 20px !important;
+            z-index: 1000011 !important;
+            color: #B58733 !important;
+            font-family: "Cormorant Garamond", Georgia, serif !important;
+            font-size: .91rem !important;
+            font-weight: 700 !important;
+            letter-spacing: .12em !important;
+          }
+
+          /* Login is a clean standalone client screen; no duplicate top wordmark. */
+          .stApp:has(.login-page-marker) [data-testid="stHeader"]::before {
+            content: "" !important;
+            display: none !important;
+          }
+
+          .stApp:has(.login-page-marker) .block-container {
+            padding-top: 2.15rem !important;
+          }
+
+          .login-logo-img {
+            width: 118px !important;
+            height: 118px !important;
+            margin-top: .15rem !important;
+          }
+
+          .banner-logo-img {
+            width: 68px !important;
+            height: 68px !important;
+          }
+
+          .st-key-rate_cards_shell [data-testid="stHorizontalBlock"] {
+            flex-direction: column !important;
+            gap: 9px !important;
+          }
+
+          .st-key-rate_cards_shell [data-testid="column"] {
+            width: 100% !important;
+            min-width: 100% !important;
+            flex: 1 1 100% !important;
+          }
+
+          .st-key-gold_rate_card,
+          .st-key-diamond_rate_card,
+          .st-key-silver_rate_card {
+            min-height: 118px !important;
+            padding: .68rem .72rem !important;
+          }
+
+          .market-photo {
+            width: 64px !important;
+            height: 64px !important;
+            flex-basis: 64px !important;
+          }
+
+          .market-copy strong {
+            font-size: 1.43rem !important;
+          }
+
+          .st-key-gold_rate_card [data-testid="stSelectbox"] {
+            top: .62rem !important;
+            right: .62rem !important;
+            width: 68px !important;
+          }
+
+          .executive-kpis {
+            gap: 8px !important;
+          }
+
+          .executive-kpi {
+            min-height: 112px !important;
+          }
+
+          .kpi-product {
+            width: 52px !important;
+            height: 42px !important;
+            right: 7px !important;
+            bottom: 7px !important;
+          }
+
+          .executive-kpi > div:nth-child(2) {
+            padding-right: 38px !important;
+          }
+
+          .metal-total-card {
+            min-height: 104px !important;
+          }
+        }
+
+        /* Streamlit popover portal — force a compact premium mobile menu */
+        [data-testid="stPopoverBody"] {
+          width: min(76vw, 292px) !important;
+          max-width: 292px !important;
+          max-height: min(74vh, 590px) !important;
+          overflow-y: auto !important;
+          padding: .68rem .70rem !important;
+          border-radius: 14px !important;
+          border: 1px solid rgba(210,163,58,.32) !important;
+          background:
+            radial-gradient(circle at 18% 0%, rgba(210,163,58,.09), transparent 9rem),
+            linear-gradient(180deg, #123E2C 0%, #092C21 100%) !important;
+          box-shadow: 0 20px 50px rgba(3,25,17,.25) !important;
+        }
+
+        [data-testid="stPopoverBody"] > div,
+        [data-testid="stPopoverBody"] [data-testid="stVerticalBlock"],
+        [data-testid="stPopoverBody"] [data-testid="stElementContainer"] {
+          background: transparent !important;
+        }
+
+        [data-testid="stPopoverBody"] .mobile-nav-brand {
+          display: flex !important;
+          align-items: center !important;
+          gap: .58rem !important;
+          padding: .12rem .08rem .58rem !important;
+          margin: 0 0 .24rem !important;
+          border-bottom: 1px solid rgba(224,190,103,.16) !important;
+        }
+
+        [data-testid="stPopoverBody"] .mobile-nav-brand img {
+          width: 40px !important;
+          height: 40px !important;
+          object-fit: contain !important;
+          border-radius: 50% !important;
+          border: 0 !important;
+          background: transparent !important;
+          box-shadow: none !important;
+        }
+
+        [data-testid="stPopoverBody"] .mobile-nav-brand strong {
+          color: #EBD9A5 !important;
+          font-family: "Cormorant Garamond", Georgia, serif !important;
+          font-size: .88rem !important;
+          letter-spacing: .09em !important;
+        }
+
+        [data-testid="stPopoverBody"] .mobile-nav-brand span {
+          color: rgba(240,219,157,.50) !important;
+          font-size: .42rem !important;
+          letter-spacing: .22em !important;
+        }
+
+        [data-testid="stPopoverBody"] .stButton {
+          margin: 0 !important;
+        }
+
+        [data-testid="stPopoverBody"] .stButton > button,
+        [data-testid="stPopoverBody"] .stButton > button[data-testid="stBaseButton-secondary"],
+        [data-testid="stPopoverBody"] .stButton > button[data-testid="stBaseButton-primary"] {
+          width: 100% !important;
+          height: 38px !important;
+          min-height: 38px !important;
+          justify-content: flex-start !important;
+          padding: .34rem .48rem !important;
+          margin: 0 !important;
+          border: 0 !important;
+          border-bottom: 1px solid rgba(237,215,150,.075) !important;
+          border-radius: 5px !important;
+          background: transparent !important;
+          box-shadow: none !important;
+          color: #F0DFAD !important;
+          text-transform: none !important;
+          letter-spacing: .025em !important;
+          font-size: .66rem !important;
+          font-weight: 500 !important;
+        }
+
+        [data-testid="stPopoverBody"] .stButton > button:hover {
+          background: rgba(210,163,58,.075) !important;
+          color: #FFF0C0 !important;
+        }
+
+        [data-testid="stPopoverBody"] .stButton > button svg {
+          display: block !important;
+          visibility: visible !important;
+          width: 16px !important;
+          height: 16px !important;
+          margin-right: .42rem !important;
+          color: #E4C66F !important;
+          fill: #E4C66F !important;
+        }
+
+        [data-testid="stPopoverBody"] hr {
+          border-color: rgba(210,163,58,.16) !important;
+          margin: .38rem 0 !important;
+        }
+
+        [data-testid="stPopoverBody"] [data-testid="stCaptionContainer"] {
+          color: rgba(246,229,177,.67) !important;
+          font-size: .52rem !important;
+        }
+
         </style>
         """,
         unsafe_allow_html=True,
