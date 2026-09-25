@@ -72,7 +72,7 @@ def require_user():
     st.markdown(
         """
         <div class="login-brand">
-          <img class="login-logo-img" src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.png" alt="Shubhraj Jewels">
+          <img class="login-logo-img" src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.webp" alt="Shubhraj Jewels">
           <div class="tag">HERITAGE · CRAFTSMANSHIP · CONTROL</div>
           <div class="headline">Shubhraj Jewels ERP</div>
           <div class="strap">Accounts, inventory and jewellery operations in one secure system.</div>
@@ -296,7 +296,7 @@ def dashboard(cid: str):
 
         <section class="brand-banner">
           <div class="banner-copy left"><span>EXQUISITE PIECES</span><strong>EXCEPTIONAL JOURNEYS</strong></div>
-          <div class="banner-center"><img class="banner-logo-img" src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.png" alt="Shubhraj Jewels logo"><strong>SHUBHRAJ JEWELS</strong><em>A LEGACY IN EVERY SPARKLE</em></div>
+          <div class="banner-center"><img class="banner-logo-img" src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.webp" alt="Shubhraj Jewels logo"><strong>SHUBHRAJ JEWELS</strong><em>A LEGACY IN EVERY SPARKLE</em></div>
           <div class="banner-arch"><div class="jewel-display">◇</div></div>
           <div class="banner-copy right"><span>CRAFTING</span><strong>A BRIGHTER TOMORROW</strong></div>
         </section>
@@ -1096,7 +1096,7 @@ with st.container(key="mobile_nav_shell"):
         st.markdown(
             """
             <div class="mobile-nav-brand">
-              <img src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.png" alt="Shubhraj Jewels">
+              <img src="https://raw.githubusercontent.com/anshdutta26-code/jewellery-erp/main/assets/srj_logo.webp" alt="Shubhraj Jewels">
               <div><strong>SHUBHRAJ JEWELS</strong><span>ERP</span></div>
             </div>
             """,
