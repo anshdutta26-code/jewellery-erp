@@ -2344,6 +2344,221 @@ def inject_css() -> None:
           }
         }
 
+
+        /* ===== Final menu + photography override ===== */
+        .banner-logo-img {
+          width: 54px;
+          height: 54px;
+          object-fit: cover;
+          border-radius: 50%;
+          border: 1px solid rgba(182,138,55,.38);
+          box-shadow: 0 5px 14px rgba(95,65,35,.08);
+          margin-bottom: .34rem;
+        }
+
+        .kpi-product,
+        .market-photo {
+          background-image: url("https://cdn.openart.ai/openart-ai/production/2026-09/create-image/nZYR5b4V8EJxAuqsA6m5/gpt-image-2.5-sunburst-1_1790302687127_486caefd.png");
+          background-repeat: no-repeat;
+          background-size: 500% 100%;
+          background-color: #FBF7EE;
+        }
+
+        .kpi-product {
+          position: absolute;
+          right: 4px;
+          bottom: 5px;
+          width: 82px;
+          height: 76px;
+          border-radius: 10px;
+          opacity: .96;
+          filter: saturate(.96) contrast(1.02);
+          -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 18%, black 100%);
+          mask-image: linear-gradient(90deg, transparent 0%, black 18%, black 100%);
+        }
+
+        .product-necklace { background-position: 0% center; }
+        .product-ring { background-position: 25% center; }
+        .product-bars { background-position: 50% center; }
+        .product-bangle { background-position: 75% center; }
+        .product-silver { background-position: 100% center; }
+
+        .market-photo {
+          width: 58px;
+          height: 58px;
+          flex: 0 0 58px;
+          border-radius: 11px;
+          border: 1px solid rgba(181,137,55,.20);
+          box-shadow: 0 4px 12px rgba(59,38,24,.045);
+        }
+
+        .rate-photo-gold { background-position: 50% center; }
+        .rate-photo-diamond { background-position: 25% center; }
+        .rate-photo-silver { background-position: 100% center; }
+
+        .st-key-mobile_nav_shell {
+          display: none !important;
+        }
+
+        @media (max-width: 900px) {
+          /* Disable the native Streamlit sidebar on mobile; use the branded popover only. */
+          [data-testid="stSidebar"],
+          [data-testid="stSidebarCollapsedControl"],
+          [data-testid="collapsedControl"],
+          [data-testid="stHeader"] button[kind="headerNoPadding"] {
+            display: none !important;
+          }
+
+          .st-key-mobile_nav_shell {
+            display: block !important;
+            position: fixed !important;
+            top: 10px !important;
+            right: 12px !important;
+            width: 46px !important;
+            height: 46px !important;
+            z-index: 1000008 !important;
+          }
+
+          .st-key-mobile_nav_shell [data-testid="stPopover"] > button,
+          .st-key-mobile_nav_shell button {
+            width: 46px !important;
+            height: 46px !important;
+            min-width: 46px !important;
+            padding: 0 !important;
+            border-radius: 8px !important;
+            border: 1px solid rgba(232,204,122,.38) !important;
+            background: #123C2C !important;
+            color: transparent !important;
+            box-shadow: 0 5px 16px rgba(10,46,34,.14) !important;
+            font-size: 0 !important;
+          }
+
+          .st-key-mobile_nav_shell button span[data-testid="stIconMaterial"] {
+            display: block !important;
+            color: #E8CC7A !important;
+            font-size: 25px !important;
+            line-height: 1 !important;
+          }
+
+          [data-testid="stHeader"]::before {
+            left: 18px !important;
+            top: 20px !important;
+            font-size: .93rem !important;
+            letter-spacing: .11em !important;
+          }
+
+          .block-container {
+            padding-top: 4.75rem !important;
+          }
+
+          .banner-logo-img {
+            width: 62px;
+            height: 62px;
+          }
+
+          .market-photo {
+            width: 64px;
+            height: 64px;
+            flex-basis: 64px;
+          }
+
+          .kpi-product {
+            width: 78px;
+            height: 72px;
+            opacity: .90;
+          }
+        }
+
+        /* Streamlit portal containing our mobile popover */
+        div[data-baseweb="popover"] {
+          z-index: 1000010 !important;
+        }
+
+        div[data-baseweb="popover"] > div {
+          border-radius: 14px !important;
+          border: 1px solid rgba(230,198,110,.28) !important;
+          box-shadow: 0 18px 50px rgba(4,25,18,.22) !important;
+        }
+
+        div[data-baseweb="popover"] [data-testid="stVerticalBlock"] {
+          gap: .22rem !important;
+        }
+
+        .mobile-nav-brand {
+          display: flex;
+          align-items: center;
+          gap: .72rem;
+          padding: .35rem .2rem .75rem;
+          margin-bottom: .25rem;
+          border-bottom: 1px solid rgba(210,163,58,.20);
+        }
+
+        .mobile-nav-brand img {
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 1px solid rgba(230,198,110,.42);
+        }
+
+        .mobile-nav-brand > div {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .mobile-nav-brand strong {
+          color: #E7D6A7;
+          font-family: "Cormorant Garamond", Georgia, serif !important;
+          font-size: 1rem;
+          letter-spacing: .10em;
+        }
+
+        .mobile-nav-brand span {
+          margin-top: .10rem;
+          color: rgba(248,232,179,.58);
+          font-size: .48rem;
+          letter-spacing: .24em;
+        }
+
+        /* Mobile popover menu buttons */
+        div[data-baseweb="popover"] .stButton > button {
+          min-height: 42px !important;
+          justify-content: flex-start !important;
+          padding: .50rem .70rem !important;
+          border-radius: 8px !important;
+          border: 1px solid transparent !important;
+          background: transparent !important;
+          color: #EADAA9 !important;
+          box-shadow: none !important;
+          text-transform: none !important;
+          letter-spacing: .01em !important;
+          font-size: .78rem !important;
+          font-weight: 500 !important;
+        }
+
+        div[data-baseweb="popover"] .stButton > button:hover {
+          background: rgba(210,163,58,.09) !important;
+          border-color: rgba(230,198,110,.18) !important;
+        }
+
+        div[data-baseweb="popover"] .stButton > button[data-testid="stBaseButton-primary"],
+        div[data-baseweb="popover"] .stButton > button[kind="primary"] {
+          background: linear-gradient(90deg, rgba(210,163,58,.17), rgba(210,163,58,.05)) !important;
+          border-color: rgba(230,198,110,.30) !important;
+          box-shadow: inset 3px 0 0 #D2A33A !important;
+        }
+
+        div[data-baseweb="popover"] .stButton > button svg {
+          color: #E6C66E !important;
+          fill: #E6C66E !important;
+        }
+
+        @media (min-width: 901px) {
+          .st-key-mobile_nav_shell {
+            display: none !important;
+          }
+        }
+
         </style>
         """,
         unsafe_allow_html=True,
