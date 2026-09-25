@@ -2559,6 +2559,219 @@ def inject_css() -> None:
           }
         }
 
+
+        /* ===== Production polish: exact mobile nav, correct logo, proportional media ===== */
+        .login-logo-img {
+          display: block;
+          width: 156px;
+          height: 156px;
+          object-fit: contain;
+          margin: .1rem auto .9rem;
+          border-radius: 50%;
+          filter: drop-shadow(0 12px 24px rgba(10,46,34,.12));
+        }
+
+        .banner-logo-img {
+          object-fit: contain !important;
+          background: transparent !important;
+          border: 0 !important;
+          box-shadow: none !important;
+        }
+
+        .kpi-product,
+        .market-photo {
+          background-size: 500% auto !important;
+          background-repeat: no-repeat !important;
+          background-color: #FFFDF8 !important;
+        }
+
+        .market-photo {
+          background-position-y: center !important;
+          overflow: hidden;
+        }
+
+        .kpi-product {
+          background-position-y: center !important;
+          -webkit-mask-image: none !important;
+          mask-image: none !important;
+          background-color: transparent !important;
+        }
+
+        .st-key-gold_purity_control {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: .55rem;
+          margin: -.1rem 0 .72rem;
+        }
+
+        .st-key-gold_purity_control .purity-label {
+          color: #846E59;
+          font-size: .50rem;
+          letter-spacing: .13em;
+          font-weight: 700;
+          white-space: nowrap;
+        }
+
+        .st-key-gold_purity_control [data-testid="stSegmentedControl"] {
+          width: auto !important;
+        }
+
+        .st-key-gold_purity_control [data-testid="stSegmentedControl"] button,
+        .st-key-gold_purity_control [role="radiogroup"] label {
+          min-height: 32px !important;
+          padding: .25rem .68rem !important;
+          border: 1px solid rgba(184,138,55,.24) !important;
+          background: rgba(255,253,248,.92) !important;
+          color: #6C5A49 !important;
+          border-radius: 999px !important;
+          font-size: .56rem !important;
+          font-weight: 700 !important;
+        }
+
+        .st-key-gold_purity_control [data-testid="stSegmentedControl"] button[aria-pressed="true"],
+        .st-key-gold_purity_control [role="radiogroup"] label:has(input:checked) {
+          background: #103C2B !important;
+          color: #F5DF9D !important;
+          border-color: #D2A33A !important;
+          box-shadow: none !important;
+        }
+
+        @media (max-width: 900px) {
+          [data-testid="stHeader"]::before {
+            left: 78px !important;
+            top: 21px !important;
+            content: "SHUBHRAJ JEWELS" !important;
+            font-size: .91rem !important;
+          }
+
+          .st-key-mobile_nav_shell {
+            left: 14px !important;
+            right: auto !important;
+            top: 10px !important;
+          }
+
+          .st-key-mobile_nav_shell [data-testid="stPopover"] > button svg,
+          .st-key-mobile_nav_shell > div > button svg {
+            display: none !important;
+          }
+
+          .st-key-mobile_nav_shell [data-testid="stPopover"] > button::after,
+          .st-key-mobile_nav_shell > div > button::after {
+            display: none !important;
+            content: none !important;
+          }
+
+          .st-key-gold_purity_control {
+            justify-content: flex-start;
+            margin-top: -.15rem;
+            margin-bottom: .72rem;
+            flex-wrap: wrap;
+          }
+
+          .login-logo-img {
+            width: 132px;
+            height: 132px;
+          }
+
+          .banner-logo-img {
+            width: 70px !important;
+            height: 70px !important;
+          }
+
+          .market-photo {
+            width: 70px !important;
+            height: 70px !important;
+            flex-basis: 70px !important;
+          }
+
+          .kpi-product {
+            width: 92px !important;
+            height: 70px !important;
+            right: 3px !important;
+            bottom: 5px !important;
+          }
+        }
+
+        /* Mobile navigation popover = website-like dark menu, not giant cards */
+        div[data-baseweb="popover"] [data-testid="stPopoverBody"],
+        div[data-baseweb="popover"] > div {
+          background: #0A2E22 !important;
+          border-color: rgba(210,163,58,.34) !important;
+        }
+
+        div[data-baseweb="popover"] [data-testid="stPopoverBody"] {
+          width: min(84vw, 330px) !important;
+          max-height: min(78vh, 620px) !important;
+          overflow-y: auto !important;
+          padding: .72rem !important;
+          border-radius: 12px !important;
+        }
+
+        div[data-baseweb="popover"] .mobile-nav-brand {
+          padding: .2rem .1rem .62rem !important;
+          margin-bottom: .25rem !important;
+        }
+
+        div[data-baseweb="popover"] .mobile-nav-brand img {
+          width: 46px !important;
+          height: 46px !important;
+          object-fit: contain !important;
+          border: 0 !important;
+        }
+
+        div[data-baseweb="popover"] .stButton {
+          margin: 0 !important;
+        }
+
+        div[data-baseweb="popover"] .stButton > button,
+        div[data-baseweb="popover"] .stButton > button[data-testid="stBaseButton-primary"],
+        div[data-baseweb="popover"] .stButton > button[data-testid="stBaseButton-secondary"] {
+          width: 100% !important;
+          min-height: 40px !important;
+          height: 40px !important;
+          justify-content: flex-start !important;
+          padding: .38rem .58rem !important;
+          border-radius: 7px !important;
+          border: 1px solid transparent !important;
+          background: transparent !important;
+          color: #F0DFAE !important;
+          box-shadow: none !important;
+          font-size: .67rem !important;
+          letter-spacing: .03em !important;
+          text-transform: none !important;
+          font-weight: 500 !important;
+        }
+
+        div[data-baseweb="popover"] .stButton > button:hover {
+          background: rgba(210,163,58,.08) !important;
+          border-color: rgba(210,163,58,.16) !important;
+        }
+
+        div[data-baseweb="popover"] .stButton > button[data-testid="stBaseButton-primary"] {
+          background: rgba(210,163,58,.12) !important;
+          border-color: rgba(230,198,110,.34) !important;
+          box-shadow: inset 3px 0 0 #D2A33A !important;
+        }
+
+        div[data-baseweb="popover"] .stButton > button svg {
+          display: block !important;
+          color: #E6C66E !important;
+          fill: #E6C66E !important;
+          width: 17px !important;
+          height: 17px !important;
+        }
+
+        div[data-baseweb="popover"] hr {
+          border-color: rgba(210,163,58,.18) !important;
+          margin: .45rem 0 !important;
+        }
+
+        div[data-baseweb="popover"] [data-testid="stCaptionContainer"] {
+          color: rgba(246,229,177,.70) !important;
+          font-size: .58rem !important;
+        }
+
         </style>
         """,
         unsafe_allow_html=True,
