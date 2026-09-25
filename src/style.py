@@ -3299,6 +3299,417 @@ def inject_css() -> None:
           font-size: .52rem !important;
         }
 
+
+        /* ===== FINAL CLIENT READY OVERRIDES: rate placement, picker, contained jewellery ===== */
+
+        .market-updated-top {
+          margin: .10rem .12rem .38rem !important;
+          padding: 0 !important;
+          justify-content: flex-end !important;
+          min-height: 20px !important;
+          color: #879089 !important;
+          font-size: .46rem !important;
+        }
+
+        .st-key-rate_cards_shell {
+          margin-top: 0 !important;
+        }
+
+        /* Gold purity is a real visible in-card picker. */
+        .st-key-gold_rate_card {
+          overflow: visible !important;
+        }
+
+        .st-key-gold_rate_card .rate-card-content {
+          padding-right: 0 !important;
+        }
+
+        .st-key-gold_rate_card [data-testid="stHorizontalBlock"] {
+          flex-direction: row !important;
+          align-items: center !important;
+          gap: .55rem !important;
+        }
+
+        .st-key-gold_rate_card [data-testid="column"]:first-child {
+          flex: 1 1 auto !important;
+          width: auto !important;
+          min-width: 0 !important;
+        }
+
+        .st-key-gold_rate_card [data-testid="column"]:last-child {
+          flex: 0 0 78px !important;
+          width: 78px !important;
+          min-width: 78px !important;
+        }
+
+        .gold-selector-label {
+          margin: 0 0 .28rem !important;
+          color: #92774D !important;
+          font-size: .43rem !important;
+          font-weight: 700 !important;
+          letter-spacing: .15em !important;
+          text-align: center !important;
+        }
+
+        .st-key-gold_rate_card [data-testid="stSelectbox"] {
+          position: static !important;
+          inset: auto !important;
+          width: 100% !important;
+          min-width: 0 !important;
+          margin: 0 !important;
+          z-index: 8 !important;
+        }
+
+        .st-key-gold_rate_card [data-testid="stSelectbox"] > div,
+        .st-key-gold_rate_card [data-testid="stSelectbox"] [data-baseweb="select"] {
+          width: 100% !important;
+          margin: 0 !important;
+        }
+
+        .st-key-gold_rate_card [data-baseweb="select"] > div {
+          min-height: 34px !important;
+          height: 34px !important;
+          padding: 0 .38rem !important;
+          border-radius: 8px !important;
+          border: 1px solid rgba(187,139,53,.58) !important;
+          background: linear-gradient(180deg, #164633, #0F392A) !important;
+          box-shadow: 0 4px 12px rgba(10,46,34,.09) !important;
+        }
+
+        .st-key-gold_rate_card [data-baseweb="select"] span,
+        .st-key-gold_rate_card [data-baseweb="select"] div {
+          color: #F3D986 !important;
+          font-size: .58rem !important;
+          font-weight: 700 !important;
+        }
+
+        .st-key-gold_rate_card [data-baseweb="select"] svg {
+          display: block !important;
+          color: #F3D986 !important;
+          fill: #F3D986 !important;
+        }
+
+        /* Rate-card jewellery always stays fully contained. */
+        .market-photo {
+          background-size: 505% auto !important;
+          background-repeat: no-repeat !important;
+          background-color: #FFFDF9 !important;
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,.65), 0 4px 12px rgba(60,40,20,.035) !important;
+        }
+
+        /* Remove all old sprite-photo KPI graphics if any stale markup remains. */
+        .executive-kpi .kpi-product,
+        .executive-kpi .product-necklace,
+        .executive-kpi .product-ring,
+        .executive-kpi .product-bars,
+        .executive-kpi .product-bangle,
+        .metal-total-mark {
+          display: none !important;
+        }
+
+        .executive-kpi {
+          position: relative !important;
+          overflow: hidden !important;
+        }
+
+        .executive-kpi > div:nth-child(2) {
+          padding-right: 48px !important;
+        }
+
+        /* Premium vector-style accents: crisp at every screen size, no cropped photography. */
+        .kpi-jewel-accent {
+          position: absolute !important;
+          right: 12px !important;
+          bottom: 10px !important;
+          width: 54px !important;
+          height: 45px !important;
+          opacity: .64 !important;
+          pointer-events: none !important;
+        }
+
+        .kpi-jewel-accent > * {
+          display: none !important;
+        }
+
+        .necklace-accent::before {
+          content: "";
+          position: absolute;
+          left: 5px;
+          top: 2px;
+          width: 40px;
+          height: 24px;
+          border: 2px solid rgba(184,132,35,.58);
+          border-top: 0;
+          border-radius: 0 0 28px 28px;
+          transform: rotate(-2deg);
+        }
+
+        .necklace-accent::after {
+          content: "◆";
+          position: absolute;
+          left: 21px;
+          top: 22px;
+          color: rgba(183,126,31,.72);
+          font-size: .76rem;
+          text-shadow: 0 3px 8px rgba(167,112,31,.12);
+        }
+
+        .ring-accent::before {
+          content: "";
+          position: absolute;
+          left: 8px;
+          top: 14px;
+          width: 36px;
+          height: 22px;
+          border: 3px solid rgba(143,150,148,.44);
+          border-radius: 50%;
+          transform: rotate(-8deg);
+        }
+
+        .ring-accent::after {
+          content: "◇";
+          position: absolute;
+          left: 19px;
+          top: 0;
+          color: rgba(164,126,58,.66);
+          font-family: Georgia, serif;
+          font-size: 1.45rem;
+          text-shadow: 0 4px 10px rgba(116,95,54,.11);
+        }
+
+        .bars-accent::before,
+        .bars-accent::after,
+        .bars-accent {
+          background: transparent !important;
+        }
+
+        .bars-accent::before {
+          content: "";
+          position: absolute;
+          left: 5px;
+          bottom: 7px;
+          width: 28px;
+          height: 14px;
+          border-radius: 3px;
+          background: linear-gradient(145deg, #E8C568, #B8862E) !important;
+          transform: skewX(-12deg);
+          box-shadow:
+            12px -9px 0 -1px rgba(211,166,65,.64),
+            20px -18px 0 -2px rgba(190,139,45,.40);
+        }
+
+        .bangle-accent::before,
+        .bangle-accent::after {
+          content: "";
+          position: absolute;
+          border-radius: 50%;
+          border: 3px solid rgba(192,139,39,.48);
+          box-shadow: inset 0 0 0 1px rgba(247,221,143,.55);
+        }
+
+        .bangle-accent::before {
+          width: 28px;
+          height: 28px;
+          left: 4px;
+          top: 10px;
+        }
+
+        .bangle-accent::after {
+          width: 28px;
+          height: 28px;
+          left: 17px;
+          top: 7px;
+          opacity: .78;
+        }
+
+        /* Total metal collection: total + per-metal breakdown + compact collection medallions. */
+        .metal-total-card {
+          grid-template-columns: 28px minmax(0,1fr) 106px !important;
+          align-items: start !important;
+          min-height: 126px !important;
+          background:
+            radial-gradient(circle at 94% 52%, rgba(210,163,58,.075), transparent 6rem),
+            rgba(255,253,248,.96) !important;
+        }
+
+        .metal-total-card > div:nth-child(2) {
+          padding-right: 0 !important;
+        }
+
+        .metal-breakdown {
+          display: flex !important;
+          flex-wrap: wrap !important;
+          gap: .28rem .35rem !important;
+          margin-top: .42rem !important;
+          max-width: 100% !important;
+        }
+
+        .metal-breakdown span {
+          display: inline-flex !important;
+          align-items: center !important;
+          gap: .20rem !important;
+          padding: .18rem .34rem !important;
+          border-radius: 999px !important;
+          border: 1px solid rgba(143,115,73,.12) !important;
+          background: rgba(247,243,234,.80) !important;
+          color: #83776B !important;
+          font-size: .40rem !important;
+          white-space: nowrap !important;
+        }
+
+        .metal-breakdown b {
+          color: #5A493A !important;
+          font-weight: 700 !important;
+        }
+
+        .metal-collection {
+          align-self: center !important;
+          display: flex !important;
+          justify-content: flex-end !important;
+          align-items: center !important;
+          width: 96px !important;
+          height: 48px !important;
+          margin-top: .7rem !important;
+        }
+
+        .metal-collection span {
+          width: 34px !important;
+          height: 34px !important;
+          display: grid !important;
+          place-items: center !important;
+          margin-left: -7px !important;
+          border-radius: 50% !important;
+          font-family: "Cormorant Garamond", Georgia, serif !important;
+          font-size: .72rem !important;
+          font-weight: 700 !important;
+          box-shadow: 0 5px 12px rgba(46,32,20,.07) !important;
+        }
+
+        .metal-collection span:first-child {
+          margin-left: 0 !important;
+        }
+
+        .metal-gold {
+          z-index: 3;
+          color: #F5D77D !important;
+          border: 1px solid #C79534 !important;
+          background: linear-gradient(145deg, #194936, #0C3226) !important;
+        }
+
+        .metal-silver {
+          z-index: 2;
+          color: #58605D !important;
+          border: 1px solid #C7CCC8 !important;
+          background: linear-gradient(145deg, #F6F7F4, #D9DDDA) !important;
+        }
+
+        .metal-platinum {
+          z-index: 1;
+          color: #6E685E !important;
+          border: 1px solid #D7CCB7 !important;
+          background: linear-gradient(145deg, #FFFCF4, #E8E0D0) !important;
+        }
+
+        @media (max-width: 900px) {
+          .market-updated-top {
+            justify-content: flex-start !important;
+            margin: .02rem .10rem .32rem !important;
+          }
+
+          /* Only the OUTER rate-card row stacks; Gold's inner row remains horizontal. */
+          .st-key-rate_cards_shell > div > [data-testid="stHorizontalBlock"] {
+            flex-direction: column !important;
+            gap: 9px !important;
+          }
+
+          .st-key-gold_rate_card [data-testid="stHorizontalBlock"] {
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: .45rem !important;
+          }
+
+          .st-key-gold_rate_card [data-testid="column"]:first-child {
+            flex: 1 1 auto !important;
+            width: calc(100% - 78px) !important;
+            min-width: 0 !important;
+          }
+
+          .st-key-gold_rate_card [data-testid="column"]:last-child {
+            flex: 0 0 74px !important;
+            width: 74px !important;
+            min-width: 74px !important;
+          }
+
+          .st-key-gold_rate_card,
+          .st-key-diamond_rate_card,
+          .st-key-silver_rate_card {
+            min-height: 118px !important;
+            padding: .70rem .72rem !important;
+          }
+
+          .st-key-gold_rate_card [data-testid="stSelectbox"] {
+            position: static !important;
+            width: 100% !important;
+          }
+
+          .gold-selector-label {
+            font-size: .40rem !important;
+            margin-bottom: .24rem !important;
+          }
+
+          .st-key-gold_rate_card [data-baseweb="select"] > div {
+            min-height: 32px !important;
+            height: 32px !important;
+          }
+
+          .market-photo {
+            width: 62px !important;
+            height: 62px !important;
+            flex-basis: 62px !important;
+          }
+
+          .market-copy strong {
+            font-size: 1.36rem !important;
+          }
+
+          .executive-kpi {
+            min-height: 108px !important;
+          }
+
+          .executive-kpi > div:nth-child(2) {
+            padding-right: 42px !important;
+          }
+
+          .kpi-jewel-accent {
+            right: 8px !important;
+            bottom: 8px !important;
+            transform: scale(.86) !important;
+            transform-origin: right bottom !important;
+            opacity: .55 !important;
+          }
+
+          .metal-total-card {
+            grid-template-columns: 28px minmax(0,1fr) 86px !important;
+            min-height: 126px !important;
+          }
+
+          .metal-collection {
+            width: 82px !important;
+            transform: scale(.92) !important;
+            transform-origin: right center !important;
+          }
+
+          .metal-breakdown {
+            max-width: 100% !important;
+            gap: .22rem !important;
+          }
+
+          .metal-breakdown span {
+            font-size: .37rem !important;
+            padding: .16rem .28rem !important;
+          }
+        }
+
         </style>
         """,
         unsafe_allow_html=True,
