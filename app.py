@@ -339,7 +339,7 @@ def dashboard(cid: str):
                 st.markdown(
                     f"""
                     <div class="rate-card-content">
-                      <div class="market-photo rate-photo-gold" aria-hidden="true"></div>
+                      <img class="market-photo-img" src="https://cdn.openart.ai/openart-ai/production/2026-09/create-image/nZYR5b4V8EJxAuqsA6m5/gpt-image-2.5-sunburst-1_1790308311756_59227a50.png" alt="24K gold bullion bars">
                       <div class="market-copy">
                         <span>GOLD · {selected_purity}</span>
                         <strong>{money_rate(selected_gold_rate)} <small>/ 10g</small></strong>
