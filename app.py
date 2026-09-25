@@ -336,29 +336,26 @@ def dashboard(cid: str):
 
         with gold_col:
             with st.container(key="gold_rate_card"):
-                gold_info, gold_picker = st.columns([4.3, 1.35], gap="small")
-                with gold_info:
-                    st.markdown(
-                        f"""
-                        <div class="rate-card-content">
-                          <div class="market-photo rate-photo-gold" aria-hidden="true"></div>
-                          <div class="market-copy">
-                            <span>GOLD · {selected_purity}</span>
-                            <strong>{money_rate(selected_gold_rate)} <small>/ 10g</small></strong>
-                            <em>{selected_purity} · 10 grams</em>
-                          </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
-                with gold_picker:
-                    st.markdown('<div class="gold-selector-label">PURITY</div>', unsafe_allow_html=True)
-                    st.selectbox(
-                        "Gold purity",
-                        ["24K", "22K", "18K"],
-                        key="gold_purity_select",
-                        label_visibility="collapsed",
-                    )
+                st.markdown(
+                    f"""
+                    <div class="rate-card-content">
+                      <div class="market-photo rate-photo-gold" aria-hidden="true"></div>
+                      <div class="market-copy">
+                        <span>GOLD · {selected_purity}</span>
+                        <strong>{money_rate(selected_gold_rate)} <small>/ 10g</small></strong>
+                        <em>{selected_purity} · 10 grams</em>
+                      </div>
+                    </div>
+                    <div class="gold-selector-label">PURITY</div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+                st.selectbox(
+                    "Gold purity",
+                    ["24K", "22K", "18K"],
+                    key="gold_purity_select",
+                    label_visibility="collapsed",
+                )
 
         with diamond_col:
             with st.container(key="diamond_rate_card"):
@@ -395,11 +392,11 @@ def dashboard(cid: str):
     st.markdown(
         f"""
         <section class="executive-kpis">
-          <article class="executive-kpi"><div class="kpi-glyph">₹</div><div><span>TODAY'S SALES</span><strong>{fmt_inr_compact(sales_today)}</strong><em>Posted vouchers</em></div><div class="kpi-jewel-accent necklace-accent" aria-hidden="true"><span>◡</span><i>◆</i></div></article>
-          <article class="executive-kpi"><div class="kpi-glyph">▣</div><div><span>TODAY'S PURCHASES</span><strong>{fmt_inr_compact(purchases_today)}</strong><em>Purchase register</em></div><div class="kpi-jewel-accent ring-accent" aria-hidden="true"><span>◇</span><i></i></div></article>
-          <article class="executive-kpi"><div class="kpi-glyph">◫</div><div><span>STOCK VALUE</span><strong>{fmt_inr_compact(stock_value)}</strong><em>As on {now_india.strftime("%d %b %Y")}</em></div><div class="kpi-jewel-accent bars-accent" aria-hidden="true"><span></span><i></i><b></b></div></article>
-          <article class="executive-kpi"><div class="kpi-glyph">◇</div><div><span>STOCK QTY</span><strong>{pieces:,.0f}<small> pcs</small></strong><em>Across all categories</em></div><div class="kpi-jewel-accent bangle-accent" aria-hidden="true"><span></span><i></i></div></article>
-          <article class="executive-kpi metal-total-card"><div class="kpi-glyph">⚖</div><div><span>TOTAL NET METAL WEIGHT</span><strong>{net_weight:,.3f}<small> g</small></strong><div class="metal-breakdown">{metal_breakdown_html}</div></div><div class="metal-collection" aria-label="Metal collection"><span class="metal-gold">Au</span><span class="metal-silver">Ag</span><span class="metal-platinum">Pt</span></div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">₹</div><div><span>TODAY'S SALES</span><strong>{fmt_inr_compact(sales_today)}</strong><em>Posted vouchers</em></div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">▣</div><div><span>TODAY'S PURCHASES</span><strong>{fmt_inr_compact(purchases_today)}</strong><em>Purchase register</em></div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">◫</div><div><span>STOCK VALUE</span><strong>{fmt_inr_compact(stock_value)}</strong><em>As on {now_india.strftime("%d %b %Y")}</em></div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">◇</div><div><span>STOCK QTY</span><strong>{pieces:,.0f}<small> pcs</small></strong><em>Across all categories</em></div></article>
+          <article class="executive-kpi metal-total-card"><div class="kpi-glyph">⚖</div><div><span>TOTAL NET METAL WEIGHT</span><strong>{net_weight:,.3f}<small> g</small></strong><div class="metal-breakdown">{metal_breakdown_html}</div></div></article>
         </section>
         """,
         unsafe_allow_html=True,
