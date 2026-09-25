@@ -303,7 +303,7 @@ def dashboard(cid: str):
 
         <section class="rate-matrix">
           <article class="market-cell gold-cell">
-            <div class="market-symbol">Au</div>
+            <div class="market-photo rate-photo-gold" aria-hidden="true"></div>
             <div class="market-copy">
               <span>GOLD · INDIA</span>
               <strong>{money_rate(gold_24_10g)} <small>/ 10g</small></strong>
@@ -311,7 +311,7 @@ def dashboard(cid: str):
             </div>
           </article>
           <article class="market-cell diamond-cell">
-            <div class="market-symbol">◇</div>
+            <div class="market-photo rate-photo-diamond" aria-hidden="true"></div>
             <div class="market-copy">
               <span>NATURAL DIAMOND</span>
               <strong>{money_rate(diamond_1ct)} <small>/ 1ct</small></strong>
@@ -319,7 +319,7 @@ def dashboard(cid: str):
             </div>
           </article>
           <article class="market-cell silver-cell">
-            <div class="market-symbol">Ag</div>
+            <div class="market-photo rate-photo-silver" aria-hidden="true"></div>
             <div class="market-copy">
               <span>SILVER · 999</span>
               <strong>{money_rate(silver_1kg)} <small>/ 1kg</small></strong>
@@ -336,11 +336,11 @@ def dashboard(cid: str):
     st.markdown(
         f"""
         <section class="executive-kpis">
-          <article class="executive-kpi"><div class="kpi-glyph">₹</div><div><span>TODAY'S SALES</span><strong>{fmt_inr_compact(sales_today)}</strong><em>Posted vouchers</em></div><div class="kpi-art necklace-art">◇</div></article>
-          <article class="executive-kpi"><div class="kpi-glyph">▣</div><div><span>TODAY'S PURCHASES</span><strong>{fmt_inr_compact(purchases_today)}</strong><em>Purchase register</em></div><div class="kpi-art ring-art">◈</div></article>
-          <article class="executive-kpi"><div class="kpi-glyph">◫</div><div><span>STOCK VALUE</span><strong>{fmt_inr_compact(stock_value)}</strong><em>As on {now_india.strftime("%d %b %Y")}</em></div><div class="kpi-art bars-art">▰</div></article>
-          <article class="executive-kpi"><div class="kpi-glyph">◇</div><div><span>STOCK QTY</span><strong>{pieces:,.0f}<small> pcs</small></strong><em>Across all categories</em></div><div class="kpi-art bangle-art">○</div></article>
-          <article class="executive-kpi"><div class="kpi-glyph">⚖</div><div><span>NET METAL WEIGHT</span><strong>{net_weight:,.3f}<small> g</small></strong><em>Purity-wise consolidated</em></div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">₹</div><div><span>TODAY'S SALES</span><strong>{fmt_inr_compact(sales_today)}</strong><em>Posted vouchers</em></div><div class="kpi-product product-necklace" aria-hidden="true"></div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">▣</div><div><span>TODAY'S PURCHASES</span><strong>{fmt_inr_compact(purchases_today)}</strong><em>Purchase register</em></div><div class="kpi-product product-ring" aria-hidden="true"></div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">◫</div><div><span>STOCK VALUE</span><strong>{fmt_inr_compact(stock_value)}</strong><em>As on {now_india.strftime("%d %b %Y")}</em></div><div class="kpi-product product-bars" aria-hidden="true"></div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">◇</div><div><span>STOCK QTY</span><strong>{pieces:,.0f}<small> pcs</small></strong><em>Across all categories</em></div><div class="kpi-product product-bangle" aria-hidden="true"></div></article>
+          <article class="executive-kpi"><div class="kpi-glyph">⚖</div><div><span>NET METAL WEIGHT</span><strong>{net_weight:,.3f}<small> g</small></strong><em>Purity-wise consolidated</em></div><div class="kpi-product product-silver" aria-hidden="true"></div></article>
         </section>
         """,
         unsafe_allow_html=True,
